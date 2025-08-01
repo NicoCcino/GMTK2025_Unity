@@ -9,8 +9,6 @@ public class LevelGridManager : MonoBehaviour
 
     public BlockData[] availableBlocks; // Liste des blocs disponibles
     public BlockData currentBlockData; // Bloc actuellement sélectionné
-    public GameObject[] blockPrefabs;
-    public GameObject currentBlockPrefab;
     public float blockHeightOffset = -1;
 
     public GameObject floorPrefab;
@@ -46,7 +44,7 @@ public class LevelGridManager : MonoBehaviour
         {
             int randomIndex = Random.Range(0, availableBlocks.Length);
             currentBlockData = availableBlocks[randomIndex];
-            currentBlockPrefab = availableBlocks[randomIndex].blockPrefab;
+            GameObject currentBlockPrefab = currentBlockData.blockPrefab;
             Debug.Log("Selected Block: " + currentBlockData.blockName);
         }
         else
@@ -152,7 +150,7 @@ public class LevelGridManager : MonoBehaviour
             Destroy(LevelGrid.grid[x, y].gameObject);
         }
 
-        GameObject newBlockGO = DrawBlock(x, y, currentBlockPrefab);
+        GameObject newBlockGO = DrawBlock(x, y, currentBlockData.blockPrefab);
 
 
         // Gestion des cellules dans grille
