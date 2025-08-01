@@ -186,10 +186,9 @@ public class LevelGridManager : MonoBehaviour
     void Start()
     {
         player = GameObject.Find("PlayerPivot");
-        SetCell(1, 1, Color.red);
-        SetCell(50, 1, Color.red);
-        SetCell(99, 1, Color.red);
-        SetCell(100, 1, Color.red);
+        SetCell(10, 0, Color.red);
+        SetCell(52, 1, Color.red);
+        SetCell(52, 0, Color.red);
 
         Debug.Log($"World to Grid: (1,1,0) -> {WorldToGrid(new Vector3(1, 1, 0))}");
         Debug.Log($"World to Grid: (-1,1,0) -> {WorldToGrid(new Vector3(-1, 1, 0))}");
