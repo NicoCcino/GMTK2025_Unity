@@ -8,6 +8,7 @@ public class LevelGridManager : MonoBehaviour
     [Header("Blocks Settings")]
 
     public BlockData[] availableBlocks; // Liste des blocs disponibles
+    public BlockData currentBlockData; // Bloc actuellement sélectionné
     public GameObject[] blockPrefabs;
     public GameObject currentBlockPrefab;
     public float blockHeightOffset = -1;
@@ -38,19 +39,47 @@ public class LevelGridManager : MonoBehaviour
 
     public float minDistanceToTeleportChunk = 50f;
 
-    public void SelectRandomBlockPrefab()
+    public void SelectRandomBlock()
     {
         // Select a random block prefab from the array
-        if (blockPrefabs.Length > 0)
+        if (availableBlocks.Length > 0)
         {
-            int randomIndex = Random.Range(0, blockPrefabs.Length);
-            currentBlockPrefab = blockPrefabs[randomIndex];
-            Debug.Log("Selected Block Prefab: " + currentBlockPrefab.name);
+            int randomIndex = Random.Range(0, availableBlocks.Length);
+            currentBlockData = availableBlocks[randomIndex];
+            currentBlockPrefab = availableBlocks[randomIndex].blockPrefab;
+            Debug.Log("Selected Block: " + currentBlockData.blockName);
         }
         else
         {
-            Debug.LogWarning("No block prefabs available to select.");
+            Debug.LogWarning("No block available to select.");
         }
+    }
+
+    public void BlockHit(int x, int y, BlockData blockData){
+        // Placement du bloc en 3D dans le monde
+        Vector3 worldPos = GridToWorld(x, y);
+        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
+        GameObject newBlockGO = Instantiate(currentBlockPrefab, worldPos, Quaternion.identity, this.transform);
+    }
+
+    public GameObject DrawBlock(int x, int y, GameObject blockPrefab)
+    {
+        // Placement du bloc en 3D dans le monde
+        Vector3 worldPos = GridToWorld(x, y);
+        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
+        GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
+
+        // Gestion du parentage du bloc au sol
+        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
+        {
+            if (worldPos.x >= floor.transform.position.x && worldPos.x < floor.transform.position.x + floorWidth)
+            { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
+                newBlockGO.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
+                break;
+            }
+        }
+
+        return newBlockGO; // Donne l'instance du bloc 3D crée en sortie
     }
 
     public void SetCell(int x, int y, Color color)
@@ -63,23 +92,11 @@ public class LevelGridManager : MonoBehaviour
             Destroy(LevelGrid.grid[x, y].gameObject);
         }
 
-        // Placement du bloc en 3D dans le monde
-        Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
-        GameObject newBlockGO = Instantiate(currentBlockPrefab, worldPos, Quaternion.identity, this.transform);
+        GameObject newBlockGO = DrawBlock(x, y, currentBlockPrefab);
 
 
         // Gestion des cellules dans grille
         Cell newCell = new Cell(newBlockGO, new Vector2Int(x, y), color);
-        // Gestion du parentage du bloc au sol
-        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
-        {
-            if (worldPos.x >= floor.transform.position.x && worldPos.x < floor.transform.position.x + floorWidth)
-            { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
-                newCell.gameObject.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
-                break;
-            }
-        }
 
         // Enregistrement du bloc dans la grille
         newCell.isSolid = true; // On marque la cellule comme solide
@@ -251,7 +268,7 @@ public class LevelGridManager : MonoBehaviour
         //Debug.Log($"World to Grid: (99,1,0) -> {WorldToGrid(new Vector3(99, 1, 0))}");
         //Debug.Log($"World to Grid: (150,1,0) -> {WorldToGrid(new Vector3(150, 1, 0))}");
 
-        SelectRandomBlockPrefab();
+        SelectRandomBlock();
 
         gridOriginBackup = gridOrigin.position;
 

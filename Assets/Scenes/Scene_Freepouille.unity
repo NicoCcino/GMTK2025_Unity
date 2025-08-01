@@ -917,6 +917,7 @@ MonoBehaviour:
   availableBlocks:
   - {fileID: 11400000, guid: 7c297460eee4d0c47aaa09225d0b15fb, type: 2}
   - {fileID: 11400000, guid: ef21e05a01e878440bdb10276c85947c, type: 2}
+  currentBlockData: {fileID: 0}
   blockPrefabs:
   - {fileID: 7914569041544102060, guid: b69a18c7d91265b41accb528c789babe, type: 3}
   - {fileID: 7892753296995450659, guid: 95001aadb71e7c64bbebb373905d98bf, type: 3}
@@ -952,6 +953,22 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3789501347079389070, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
   m_PrefabInstance: {fileID: 1244560706824534588}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &807385639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807385638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e68f20f0bebe50e4a91e79ca89188d6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpHeight: 3
+  jumpDuration: 0.5
+  gravity: 20
+  levelGridManager: {fileID: 718335858}
 --- !u!1 &958669817
 GameObject:
   m_ObjectHideFlags: 0
@@ -2167,7 +2184,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3789501347079389070, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 807385639}
   m_SourcePrefab: {fileID: 100100000, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
 --- !u!1001 &1452678966937673128
 PrefabInstance:
