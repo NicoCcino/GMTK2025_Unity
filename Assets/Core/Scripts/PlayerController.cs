@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
         }
         
         // Initialize last mouse grid position
-        lastMouseGridPosition = Vector2Int.zero;
+        lastMouseGridPosition = new Vector2Int(0, currentBlockHeight);
         
         // Initialize block falling system
         ResetBlockHeight();
@@ -97,13 +97,25 @@ public class PlayerController : MonoBehaviour
             mouseWorldPos = ray.origin + ray.direction * distance;
             mouseWorldPos.z = 0;
         }
-        
-        // Convert world position to grid position using LevelGridManager's WorldToGrid function
-        Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
-
+        Vector2Int mouseGridPos = lastMouseGridPosition;
+        Debug.Log("lastMouseGridPosition: " + lastMouseGridPosition);
+        if (LevelGrid.grid[lastMouseGridPosition.x+1, lastMouseGridPosition.y] == null)
+        {
+            // Convert world position to grid position using LevelGridManager's WorldToGrid function
+            mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
+        }
         Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
         mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
+        if (mouseGridPos.x <0)
+        {
+            mouseGridPos = new Vector2Int(0, mouseGridPos.y);
+        }
+        if (mouseGridPos.y <0)
+        {
+            mouseGridPos = new Vector2Int(mouseGridPos.x, 0);
+        }
 
+        Debug.Log("mouseGridPos: " + mouseGridPos);
         // Only update if the grid position has changed
         if (mouseGridPos != lastMouseGridPosition)
         {
