@@ -26,7 +26,8 @@ public class PlayerJump : MonoBehaviour
     {
         Vector2Int playerGridPosition;
         playerGridPosition = levelGridManager.GetPlayerGridPosition();
-        if (LevelGrid.grid[playerGridPosition.x + 1, playerGridPosition.y] != null)
+        Debug.Log("Player Grid Position: " + playerGridPosition);
+        if ((LevelGrid.grid[playerGridPosition.x + 1, playerGridPosition.y] != null) && !isJumping)
         {
             Debug.Log("Player can jump");
             StartJump();
@@ -60,19 +61,39 @@ public class PlayerJump : MonoBehaviour
         transform.position = pos;
         lastHeightOffset = heightOffset;
 
-        // Vérifie si le joueur a atterri
-        if (heightOffset <= lastHeightOffset && lastHeightOffset > 0)
+        // Check if player has landed
+        if ((heightOffset < lastHeightOffset) && lastHeightOffset > 0)
         {
-
-            if ((playerGridPosition.y == 0) || (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y - 1] != null))
-            {
-                Debug.Log("Player has landed" + playerGridPosition.y);
-                // Fin du saut
-                t = 1f;
-                isJumping = false;
-                pos.y = levelGridManager.GetPlayerGridPosition().y + 0.5f; // Ajuste la position pour qu'elle soit au-dessus de la grille
-            }
+            CheckStopJump();
+            Debug.Log("Check Stop Jump");
         }
     }
 
+    void CheckStopJump()
+    {
+        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        
+        // Check if player has landed on ground or on a block
+        if ((playerGridPosition.y == 0) || (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y - 1] != null))
+        {
+            Debug.Log("Player has landed at " + playerGridPosition.y);
+            
+            // End the jump
+            isJumping = false;
+            
+            // Adjust position to be above the grid
+            Vector3 pos = transform.position;
+            Debug.Log("Player has landed at grid Y: " + playerGridPosition.y);
+            
+            // Debug: Check grid origin and world conversion
+            Vector3 worldPos = levelGridManager.GridToWorld(playerGridPosition.x, playerGridPosition.y);
+            Debug.Log("Grid origin: " + levelGridManager.gridOrigin.position);
+            Debug.Log("Grid to world conversion: (" + playerGridPosition.x + "," + playerGridPosition.y + ") -> " + worldPos);
+            Debug.Log("Current player world position: " + transform.position);
+            
+            pos.y = worldPos.y + 0.5f;
+            Debug.Log("Final landing position Y: " + pos.y);
+            transform.position = pos;
+        }
+    }
 }
