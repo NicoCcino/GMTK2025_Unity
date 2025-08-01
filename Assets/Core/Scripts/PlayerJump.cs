@@ -20,6 +20,7 @@ public class PlayerJump : MonoBehaviour
     private float currentVelocity = 0f;
 
     private float lastHeightOffset = 0;
+    private bool isDead = false;
 
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
@@ -34,6 +35,10 @@ public class PlayerJump : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isDead)
+        {
+            return;
+        }
         Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
         Vector3 pos = transform.position;
         
@@ -44,7 +49,6 @@ public class PlayerJump : MonoBehaviour
         || (LevelGrid.grid[(playerGridPosition.x+1)%(LevelGrid.gridWidth-1), playerGridPosition.y] != null))
         && currentState == PlayerState.Stable)
         {
-            Debug.Log("Player jump obstacle");
             StartJump();
         }
         // Check if player have to jump hole
@@ -53,7 +57,6 @@ public class PlayerJump : MonoBehaviour
             if (((LevelGrid.grid[(playerGridPosition.x + 2)%(LevelGrid.gridWidth-1), playerGridPosition.y-1] == null) 
             && (playerGridPosition.y-1 >= 0))&& currentState == PlayerState.Stable)
             {
-                Debug.Log("Player jump hole");
                 StartJump();
             }
         }
@@ -71,6 +74,15 @@ public class PlayerJump : MonoBehaviour
                 UpdateStable();
                 break;
         }
+
+        // Check death
+        if ((LevelGrid.grid[playerGridPosition.x, playerGridPosition.y] != null) || (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y+1] != null))
+        {
+            Debug.Log("Player is dead");
+            // Stop player movement
+            Script_Move_World.isPlayerDead = true;
+            isDead = true;
+        }
     }
 
     void CheckForFalling(Vector2Int playerGridPosition)
@@ -80,7 +92,6 @@ public class PlayerJump : MonoBehaviour
         
         if (!hasSupport)
         {
-            Debug.Log("Player is falling - no support underneath");
             StartDescending();
         }
     }
@@ -125,7 +136,6 @@ public class PlayerJump : MonoBehaviour
         // Check if we've reached the peak (velocity becomes negative)
         if (currentVelocity <= 0)
         {
-            Debug.Log("Reached jump peak, transitioning to descending");
             currentState = PlayerState.Descending;
         }
         
@@ -140,7 +150,6 @@ public class PlayerJump : MonoBehaviour
         // Check the player position with a margin of 0.5f to have the bottom of the player touching the ground
         if (pos.y <= 0.5f)
         {
-            Debug.Log($"Player has landed on the ground at position: {pos}");
             StopDescending();
             return;
         }
@@ -148,7 +157,6 @@ public class PlayerJump : MonoBehaviour
         Vector2Int playerGridPosition = levelGridManager.WorldToGrid(new Vector3(pos.x, pos.y - 0.5f, 0));
         if (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y] != null)
         {
-            Debug.Log($"Player has landed on a block at position: {pos}, grid position: {playerGridPosition}");
             StopDescending();
             return;
         }
@@ -168,12 +176,7 @@ public class PlayerJump : MonoBehaviour
         Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
         Vector3 pos = transform.position;
         
-        Debug.Log($"StopDescending - Current pos: {pos}, playerGridPosition: {playerGridPosition}");
-        Debug.Log($"StopDescending - Setting pos.y to: {playerGridPosition.y + 0.5f}");
-        
         pos.y = playerGridPosition.y + 0.5f;
         transform.position = pos;
-        
-        Debug.Log($"StopDescending - Final pos: {transform.position}");
     }
 }
