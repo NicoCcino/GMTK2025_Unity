@@ -211,6 +211,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &718335857
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 718335859}
+  - component: {fileID: 718335858}
+  m_Layer: 0
+  m_Name: LevelGridManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &718335858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 718335857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ff6b8b9cbae9a64a9c463d01f6b15cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockPrefab: {fileID: 6614318499680009648, guid: efb98e375f765014ea6ed43741860bde, type: 3}
+  player: {fileID: 0}
+  playerGridPosition: {x: 0, y: 0}
+  gizmoColor: {r: 1, g: 1, b: 1, a: 1}
+  cellSize: 1
+--- !u!4 &718335859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 718335857}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.07625, y: 1.39605, z: 0.49416}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1209168399
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,6 +393,7 @@ GameObject:
   - component: {fileID: 1343252796}
   - component: {fileID: 1343252795}
   - component: {fileID: 1343252794}
+  - component: {fileID: 1343252798}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -442,6 +492,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1343252798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1343252793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d13349a08c531f498b91af1797ec23c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1343252793}
+  levelGridManager: {fileID: 718335858}
 --- !u!1 &2134124764
 GameObject:
   m_ObjectHideFlags: 0
@@ -558,3 +622,4 @@ SceneRoots:
   - {fileID: 1209168401}
   - {fileID: 2134124768}
   - {fileID: 1343252797}
+  - {fileID: 718335859}
