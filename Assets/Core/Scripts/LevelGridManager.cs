@@ -20,10 +20,17 @@ public class LevelGridManager : MonoBehaviour
     [Tooltip("Color of the grid gizmos")]
     public Color gizmoColor = Color.gray;
     public float cellSize = 1f;
-    public Transform origin;
+    [Tooltip("Origin point for the grid in the world")]
+    public Transform gridOrigin;
+
+    [Header("Infinite Ground Settings")]
+    [Tooltip("Reference to the player GameObject")]
+
+    public float minDistanceToTeleportChunk = 50f;
 
     public void SetCell(int x, int y, Color color)
     {
+        // Check if the coordinates are within bounds
         if (!LevelGrid.InBounds(x, y)) return;
 
         if (LevelGrid.grid[x, y] != null)
@@ -31,7 +38,7 @@ public class LevelGridManager : MonoBehaviour
             Destroy(LevelGrid.grid[x, y].gameObject);
         }
 
-
+        // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
         worldPos += new Vector3(cellSize, cellSize, 0) * 0.5f; // Center the block in the cell
         GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
@@ -39,16 +46,16 @@ public class LevelGridManager : MonoBehaviour
 
 
         // Gestion du parentage du bloc au sol
-        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor")){
+        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
+        {
             if (worldPos.x >= floor.transform.position.x && worldPos.x < floor.transform.position.x + floorWidth)
             { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
                 newBlock.gameObject.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
                 break;
             }
         }
-        
 
-
+        // Enregistrement du bloc dans la grille
         LevelGrid.grid[x, y] = newBlock;
     }
 
@@ -65,16 +72,26 @@ public class LevelGridManager : MonoBehaviour
 
     public Vector3 GridToWorld(int x, int y)
     {
-        return new Vector3(x, y, 0);
+        Vector3 worldPosition = new Vector3(x, y, 0);
+        // On ajoute l'offset de la grille
+        worldPosition += gridOrigin.position;
+        return worldPosition;
     }
 
     public Vector2Int WorldToGrid(Vector3 position)
     {
-        return new Vector2Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
+
+        Vector2Int gridPosition = new Vector2Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
+        // On force les coordonnées X à être dans l'intervalle de la grille (par exemple entre 0 et 100)
+        while (gridPosition.x > LevelGrid.gridWidth -1)
+        {
+            gridPosition.x -= LevelGrid.gridWidth;
+        }
+        return gridPosition;
     }
 
 
-// Affichage de la grille en éditeur
+    // Affichage de la grille en éditeur
 
     private void OnDrawGizmos()
     {
@@ -86,7 +103,7 @@ public class LevelGridManager : MonoBehaviour
             {
                 Vector3 pos = GridToWorld(x, y) + new Vector3(cellSize, cellSize, 0) * 0.5f;
                 // Add offset based on the grid position in the world
-                pos += origin.position;
+                pos += gridOrigin.position;
                 Gizmos.DrawWireCube(pos, new Vector3(cellSize, cellSize, 0.1f));
 
 
@@ -100,16 +117,54 @@ public class LevelGridManager : MonoBehaviour
         }
     }
 
+
+
+    private void MoveChunkToFront()
+    {
+        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
+        {
+            float distanceToPlayer = player.transform.position.x - floor.transform.position.x;
+
+            // Si le sol est trop loin derrière le joueur
+            if (distanceToPlayer > minDistanceToTeleportChunk)
+            {
+                // Trouve la position du sol le plus à droite
+                float maxX = GetMaxFloorXExcept(floor);
+
+                // Le téléporte juste après
+                floor.transform.position = new Vector3(maxX + floorWidth, floor.transform.position.y, floor.transform.position.z);
+            }
+        }
+    }
+
+    float GetMaxFloorXExcept(GameObject exclude)
+    {
+        float maxX = -1000f; // Valeur initiale très basse
+
+        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
+        {
+            if (floor != exclude)
+            {
+                maxX = Mathf.Max(maxX, floor.transform.position.x);
+            }
+        }
+
+        return maxX;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         player = GameObject.Find("PlayerPivot");
-        SetCell (1,1, Color.red);
+        SetCell(1, 1, Color.red);
+        SetCell(52, 1, Color.red);
+        SetCell(52, 0, Color.red);
     }
 
     // Update is called once per frame
     void Update()
     {
         playerGridPosition = WorldToGrid(player.transform.position);
+        MoveChunkToFront();
     }
 }
