@@ -241,10 +241,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockPrefab: {fileID: 6614318499680009648, guid: efb98e375f765014ea6ed43741860bde, type: 3}
-  player: {fileID: 0}
+  floorPrefab: {fileID: 0}
+  floorWidth: 50
+  player: {fileID: 807385638}
   playerGridPosition: {x: 0, y: 0}
-  gizmoColor: {r: 1, g: 1, b: 1, a: 1}
+  gizmoColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   cellSize: 1
+  origin: {fileID: 1741758150}
 --- !u!4 &718335859
 Transform:
   m_ObjectHideFlags: 0
@@ -538,6 +541,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 807385638}
   levelGridManager: {fileID: 718335858}
+--- !u!1 &1741758149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1741758150}
+  m_Layer: 0
+  m_Name: FloorPivot1
+  m_TagString: Floor
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1741758150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1741758149}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2134124768}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2134124764
 GameObject:
   m_ObjectHideFlags: 0
@@ -551,7 +586,7 @@ GameObject:
   - component: {fileID: 2134124766}
   - component: {fileID: 2134124765}
   m_Layer: 0
-  m_Name: FloorChunk1
+  m_Name: FloorMesh1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -639,12 +674,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134124764}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 25, y: -0.5, z: 0}
   m_LocalScale: {x: 50, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1741758150}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -652,6 +687,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 42772876}
   - {fileID: 1209168401}
-  - {fileID: 2134124768}
   - {fileID: 718335859}
   - {fileID: 807385639}
+  - {fileID: 1741758150}
