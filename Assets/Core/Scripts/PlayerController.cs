@@ -155,7 +155,7 @@ public class PlayerController : MonoBehaviour
             // Update last position
             lastMouseGridPosition = mouseGridPos;
             // We have to compute if we keep this new bloc position or not
-            if (PlayerPivotGridPos.y + currentBlockHeight == 0)
+            if (PlayerPivotGridPos.y + currentBlockHeight <= 0)
             {
                 // we reached the bottom of the grid, keep the bloc in position and reset the block height
                 ResetBlockHeight();

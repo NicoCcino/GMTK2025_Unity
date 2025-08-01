@@ -34,20 +34,28 @@ public class PlayerJump : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector2Int playerGridPosition;
-        playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        Vector3 pos = transform.position;
         
-        // Check if player have to jump
-        if ((LevelGrid.grid[playerGridPosition.x + 1, playerGridPosition.y] != null) && currentState == PlayerState.Stable)
+        // Check if player have to jump obstacle
+        Vector2Int forwardPlayerGridPosition = levelGridManager.WorldToGrid(new Vector3(pos.x + 1f, pos.y, 0));
+        if (((LevelGrid.grid[(forwardPlayerGridPosition.x+1)%(LevelGrid.gridWidth-1), forwardPlayerGridPosition.y] != null)
+        || (LevelGrid.grid[(forwardPlayerGridPosition.x+1)%(LevelGrid.gridWidth-1), forwardPlayerGridPosition.y+1] != null)
+        || (LevelGrid.grid[(playerGridPosition.x+1)%(LevelGrid.gridWidth-1), playerGridPosition.y] != null))
+        && currentState == PlayerState.Stable)
         {
-            Debug.Log("Player can jump");
+            Debug.Log("Player jump obstacle");
             StartJump();
         }
-
-        // Check if player should be falling (no support underneath)
-        if (currentState == PlayerState.Stable)
+        // Check if player have to jump hole
+        if (playerGridPosition.y > 0)
         {
-            CheckForFalling(playerGridPosition);
+            if (((LevelGrid.grid[(playerGridPosition.x + 2)%(LevelGrid.gridWidth-1), playerGridPosition.y-1] == null) 
+            && (playerGridPosition.y-1 >= 0))&& currentState == PlayerState.Stable)
+            {
+                Debug.Log("Player jump hole");
+                StartJump();
+            }
         }
 
         // Call appropriate updater based on state
@@ -99,7 +107,8 @@ public class PlayerJump : MonoBehaviour
     void UpdateStable()
     {
         // Player is stable on ground or block, no movement needed
-        // This function can be used for any stable state logic if needed
+        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        CheckForFalling(playerGridPosition);
     }
 
     void UpdateAscending()
@@ -125,14 +134,13 @@ public class PlayerJump : MonoBehaviour
 
     void UpdateDescending()
     {
-        Debug.Log("Update Descending");
         Vector3 pos = transform.position;
         
         // Check if player has landed
         // Check the player position with a margin of 0.5f to have the bottom of the player touching the ground
         if (pos.y <= 0.5f)
         {
-            Debug.Log("Player has landed on the ground");
+            Debug.Log($"Player has landed on the ground at position: {pos}");
             StopDescending();
             return;
         }
@@ -140,7 +148,7 @@ public class PlayerJump : MonoBehaviour
         Vector2Int playerGridPosition = levelGridManager.WorldToGrid(new Vector3(pos.x, pos.y - 0.5f, 0));
         if (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y] != null)
         {
-            Debug.Log("Player has landed on a block");
+            Debug.Log($"Player has landed on a block at position: {pos}, grid position: {playerGridPosition}");
             StopDescending();
             return;
         }
@@ -159,8 +167,13 @@ public class PlayerJump : MonoBehaviour
         // Adjust position to be above the grid
         Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
         Vector3 pos = transform.position;
-        Vector3 worldPos = levelGridManager.GridToWorld(playerGridPosition.x, playerGridPosition.y);
-        pos.y = worldPos.y + 0.5f;
+        
+        Debug.Log($"StopDescending - Current pos: {pos}, playerGridPosition: {playerGridPosition}");
+        Debug.Log($"StopDescending - Setting pos.y to: {playerGridPosition.y + 0.5f}");
+        
+        pos.y = playerGridPosition.y + 0.5f;
         transform.position = pos;
+        
+        Debug.Log($"StopDescending - Final pos: {transform.position}");
     }
 }
