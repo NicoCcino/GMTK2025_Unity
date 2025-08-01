@@ -6,7 +6,10 @@ public class LevelGridManager : MonoBehaviour
 
 
     [Header("Blocks Settings")]
-    public GameObject blockPrefab;
+
+    public BlockData[] availableBlocks; // Liste des blocs disponibles
+    public GameObject[] blockPrefabs;
+    public GameObject currentBlockPrefab;
     public float blockHeightOffset = -1;
 
     public GameObject floorPrefab;
@@ -35,6 +38,21 @@ public class LevelGridManager : MonoBehaviour
 
     public float minDistanceToTeleportChunk = 50f;
 
+    public void SelectRandomBlockPrefab()
+    {
+        // Select a random block prefab from the array
+        if (blockPrefabs.Length > 0)
+        {
+            int randomIndex = Random.Range(0, blockPrefabs.Length);
+            currentBlockPrefab = blockPrefabs[randomIndex];
+            Debug.Log("Selected Block Prefab: " + currentBlockPrefab.name);
+        }
+        else
+        {
+            Debug.LogWarning("No block prefabs available to select.");
+        }
+    }
+
     public void SetCell(int x, int y, Color color)
     {
         // Check if the coordinates are within bounds
@@ -48,23 +66,26 @@ public class LevelGridManager : MonoBehaviour
         // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
         worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
-        GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
-        Block newBlock = new Block(newBlockGO, new Vector2Int(x, y), color);
+        GameObject newBlockGO = Instantiate(currentBlockPrefab, worldPos, Quaternion.identity, this.transform);
 
 
+        // Gestion des cellules dans grille
+        Cell newCell = new Cell(newBlockGO, new Vector2Int(x, y), color);
         // Gestion du parentage du bloc au sol
         foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
         {
             if (worldPos.x >= floor.transform.position.x && worldPos.x < floor.transform.position.x + floorWidth)
             { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
-                newBlock.gameObject.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
+                newCell.gameObject.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
                 break;
             }
         }
 
         // Enregistrement du bloc dans la grille
-        LevelGrid.grid[x, y] = newBlock;
+        newCell.isSolid = true; // On marque la cellule comme solide
+        LevelGrid.grid[x, y] = newCell;
     }
+
 
     public void ClearCell(int x, int y)
     {
@@ -193,7 +214,7 @@ public class LevelGridManager : MonoBehaviour
         int count = 0;  
         for (int y = 0; y < LevelGrid.gridHeight; y++)
         {
-            Block block = LevelGrid.grid[column, y];
+            Cell block = LevelGrid.grid[column, y];
             if (block != null)
             {
                 count += block.value; // On additionne la valeur du bloc
@@ -220,15 +241,17 @@ public class LevelGridManager : MonoBehaviour
     {
         player = GameObject.Find("PlayerPivot");
         moneyManager = GameObject.Find("MoneyManager").GetComponent<MoneyManager>();
-        SetCell(10, 0, Color.red);
-        SetCell(52, 1, Color.red);
-        SetCell(52, 0, Color.red);
+        //SetCell(10, 0, Color.red);
+        //SetCell(52, 1, Color.red);
+        //SetCell(52, 0, Color.red);
 
-        Debug.Log($"World to Grid: (1,1,0) -> {WorldToGrid(new Vector3(1, 1, 0))}");
-        Debug.Log($"World to Grid: (-1,1,0) -> {WorldToGrid(new Vector3(-1, 1, 0))}");
-        Debug.Log($"World to Grid: (50,50,0) -> {WorldToGrid(new Vector3(50, 50, 0))}");
-        Debug.Log($"World to Grid: (99,1,0) -> {WorldToGrid(new Vector3(99, 1, 0))}");
-        Debug.Log($"World to Grid: (150,1,0) -> {WorldToGrid(new Vector3(150, 1, 0))}");
+        //Debug.Log($"World to Grid: (1,1,0) -> {WorldToGrid(new Vector3(1, 1, 0))}");
+        //Debug.Log($"World to Grid: (-1,1,0) -> {WorldToGrid(new Vector3(-1, 1, 0))}");
+        //Debug.Log($"World to Grid: (50,50,0) -> {WorldToGrid(new Vector3(50, 50, 0))}");
+        //Debug.Log($"World to Grid: (99,1,0) -> {WorldToGrid(new Vector3(99, 1, 0))}");
+        //Debug.Log($"World to Grid: (150,1,0) -> {WorldToGrid(new Vector3(150, 1, 0))}");
+
+        SelectRandomBlockPrefab();
 
         gridOriginBackup = gridOrigin.position;
 

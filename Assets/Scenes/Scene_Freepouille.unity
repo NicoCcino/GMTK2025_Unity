@@ -914,7 +914,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff6b8b9cbae9a64a9c463d01f6b15cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockPrefab: {fileID: 7914569041544102060, guid: b69a18c7d91265b41accb528c789babe, type: 3}
+  availableBlocks:
+  - {fileID: 11400000, guid: 7c297460eee4d0c47aaa09225d0b15fb, type: 2}
+  - {fileID: 11400000, guid: ef21e05a01e878440bdb10276c85947c, type: 2}
+  blockPrefabs:
+  - {fileID: 7914569041544102060, guid: b69a18c7d91265b41accb528c789babe, type: 3}
+  - {fileID: 7892753296995450659, guid: 95001aadb71e7c64bbebb373905d98bf, type: 3}
+  - {fileID: 288894404862098388, guid: d42a5a8bee1e3c748888473f69767d31, type: 3}
+  currentBlockPrefab: {fileID: 0}
   blockHeightOffset: -1
   floorPrefab: {fileID: 0}
   floorWidth: 50
