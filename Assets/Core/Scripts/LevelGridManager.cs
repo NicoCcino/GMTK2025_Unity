@@ -98,9 +98,9 @@ public class LevelGridManager : MonoBehaviour
     {
         Gizmos.color = gizmoColor;
 
-        for (int x = 0; x < LevelGrid.gridWidth - 1; x++)
+        for (int x = 0; x < LevelGrid.gridWidth; x++)
         {
-            for (int y = 0; y < LevelGrid.gridHeight - 1; y++)
+            for (int y = 0; y < LevelGrid.gridHeight ; y++)
             {
                 Vector3 pos = GridToWorld(x, y) + new Vector3(cellSize, cellSize, 0) * 0.5f;
                 Gizmos.DrawWireCube(pos, new Vector3(cellSize, cellSize, 0.1f));
