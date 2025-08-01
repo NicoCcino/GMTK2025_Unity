@@ -22,6 +22,7 @@ public class LevelGridManager : MonoBehaviour
     public float cellSize = 1f;
     [Tooltip("Origin point for the grid in the world")]
     public Transform gridOrigin;
+    public Vector3 gridOriginBackup;
 
     [Header("Infinite Ground Settings")]
     [Tooltip("Reference to the player GameObject")]
@@ -72,10 +73,25 @@ public class LevelGridManager : MonoBehaviour
 
     public Vector3 GridToWorld(int x, int y)
     {
-        Vector3 worldPosition = new Vector3(x + gridOrigin.position.x, y, 0);         // On ajoute l'offset de la grille
-        // Debug.Log($"Grid to World: ({x}, {y}) -> {worldPosition}");
-        return worldPosition;
+        // On envoie chier si les coordonnées sont hors de la grille
+        if (x > LevelGrid.gridWidth - 1 || y > LevelGrid.gridHeight - 1)
+        {
+            Debug.LogError($"GridToWorld: Coordinates ({x}, {y}) are out of bounds for the grid size ({LevelGrid.gridWidth}, {LevelGrid.gridHeight})");
+        }
+        if (x < 0 || y < 0)
+        {
+            Debug.LogError($"GridToWorld: Coordinates ({x}, {y}) cannot be negative.");
+        }
 
+        // Si la case est en dessous de 50, j'utilise l'origine de la grille
+        if (x < 50)
+        {
+            return new Vector3(x, y, 0) + gridOrigin.position;
+        }
+        else
+        {
+            return new Vector3(x, y, 0) + gridOriginBackup;
+        }
     }
 
     public Vector2Int WorldToGrid(Vector3 position)
@@ -83,7 +99,7 @@ public class LevelGridManager : MonoBehaviour
 
         Vector2Int gridPosition = new Vector2Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
         // On force les coordonnées X à être dans l'intervalle de la grille (par exemple entre 0 et 100)
-        while (gridPosition.x > LevelGrid.gridWidth -1)
+        while (gridPosition.x > LevelGrid.gridWidth - 1)
         {
             gridPosition.x -= LevelGrid.gridWidth;
         }
@@ -100,7 +116,7 @@ public class LevelGridManager : MonoBehaviour
 
         for (int x = 0; x < LevelGrid.gridWidth; x++)
         {
-            for (int y = 0; y < LevelGrid.gridHeight ; y++)
+            for (int y = 0; y < LevelGrid.gridHeight; y++)
             {
                 Vector3 pos = GridToWorld(x, y) + new Vector3(cellSize, cellSize, 0) * 0.5f;
                 Gizmos.DrawWireCube(pos, new Vector3(cellSize, cellSize, 0.1f));
@@ -132,7 +148,14 @@ public class LevelGridManager : MonoBehaviour
 
                 // Le téléporte juste après
                 floor.transform.position = new Vector3(maxX + floorWidth, floor.transform.position.y, floor.transform.position.z);
+
+                // Met à jour le backup quand le floor 2 qui ne contient pas la grille est déplacé après le floor 1 qui contient la grille
+                if (floor.name == "FloorPivot2")
+                {
+                    gridOriginBackup = gridOrigin.position;
+                }
             }
+
         }
     }
 
@@ -164,8 +187,9 @@ public class LevelGridManager : MonoBehaviour
     {
         player = GameObject.Find("PlayerPivot");
         SetCell(1, 1, Color.red);
-        SetCell(52, 1, Color.red);
-        SetCell(52, 0, Color.red);
+        SetCell(50, 1, Color.red);
+        SetCell(99, 1, Color.red);
+        SetCell(100, 1, Color.red);
 
         Debug.Log($"World to Grid: (1,1,0) -> {WorldToGrid(new Vector3(1, 1, 0))}");
         Debug.Log($"World to Grid: (-1,1,0) -> {WorldToGrid(new Vector3(-1, 1, 0))}");
@@ -173,6 +197,7 @@ public class LevelGridManager : MonoBehaviour
         Debug.Log($"World to Grid: (99,1,0) -> {WorldToGrid(new Vector3(99, 1, 0))}");
         Debug.Log($"World to Grid: (150,1,0) -> {WorldToGrid(new Vector3(150, 1, 0))}");
 
+        gridOriginBackup = gridOrigin.position;
 
     }
 
