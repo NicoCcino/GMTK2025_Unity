@@ -29,6 +29,7 @@ public class LevelGridManager : MonoBehaviour
         }
 
         Vector3 worldPos = GridToWorld(x, y);
+        worldPos += new Vector3(cellSize, cellSize, 0) * 0.5f; // Center the block in the cell
         GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
         Block newBlock = new Block(newBlockGO, new Vector2Int(x, y), color);
 
@@ -53,18 +54,19 @@ public class LevelGridManager : MonoBehaviour
 
     public Vector2Int WorldToGrid(Vector3 position)
     {
-        return new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+        return new Vector2Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
     }
 
 
+// Affichage de la grille en éditeur
 
     private void OnDrawGizmos()
     {
         Gizmos.color = gizmoColor;
 
-        for (int x = 0; x < LevelGrid.gridWidth-1; x++)
+        for (int x = 0; x < LevelGrid.gridWidth - 1; x++)
         {
-            for (int y = 0; y < LevelGrid.gridHeight-1; y++)
+            for (int y = 0; y < LevelGrid.gridHeight - 1; y++)
             {
                 Vector3 pos = GridToWorld(x, y) + new Vector3(cellSize, cellSize, 0) * 0.5f;
                 Gizmos.DrawWireCube(pos, new Vector3(cellSize, cellSize, 0.1f));
@@ -82,7 +84,7 @@ public class LevelGridManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        player = GameObject.Find("Player");
+        player = GameObject.Find("PlayerPivot");
         SetCell (1,1, Color.red);
     }
 
