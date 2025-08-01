@@ -10,9 +10,21 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Color for the cell when mouse is over it")]
     public Color cellColor = Color.blue;
     
+    [Tooltip("Height offset above player for block placement")]
+    public int initialBlocHeight = 5;
+    
+    [Tooltip("Speed at which the block falls in cells per second")]
+    public float blockFallSpeed = 1f;
+
+    [Tooltip("Speed at which the block falls when clicking in cells per second")]
+    public float blockClickFallSpeed = 0.01f;
+    
     private Camera mainCamera;
     private Vector2Int lastMouseGridPosition;
     private Mouse mouse;
+    private float fallTimer;
+    private int currentBlockHeight;
+    private float blockSpeed;
     
     void Start()
     {
@@ -30,11 +42,16 @@ public class PlayerController : MonoBehaviour
         
         // Initialize last mouse grid position
         lastMouseGridPosition = Vector2Int.zero;
+        
+        // Initialize block falling system
+        ResetBlockHeight();
+        blockSpeed = blockFallSpeed;
     }
     
     void Update()
     {
         HandleMouseInput();
+        UpdateBlockFalling();
     }
     
     void HandleMouseInput()
@@ -85,7 +102,7 @@ public class PlayerController : MonoBehaviour
         Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
 
         Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
-        mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + 5);
+        mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
 
         // Only update if the grid position has changed
         if (mouseGridPos != lastMouseGridPosition)
@@ -101,12 +118,33 @@ public class PlayerController : MonoBehaviour
             
             // Update last position
             lastMouseGridPosition = mouseGridPos;
+            // We have to compute if we keep this new bloc position or not
+            if (currentBlockHeight == 0)
+            {
+                // we reached the bottom of the grid, keep the bloc in position and reset the block height
+                ResetBlockHeight();
+                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, cellColor);
+                lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
+            }
+        // if cell under mouseGridPos is set
+        if (LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null)
+        {
+            // The cell under mouseGridPos is set
+            ResetBlockHeight();
+                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, cellColor);
+                lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
+        }
         }
         
-        // Handle left mouse click
+        // Handle left mouse click and release
         if (mouse.leftButton.wasPressedThisFrame)
         {
-            OnLeftMouseClick(mouseGridPos);
+            blockSpeed = blockClickFallSpeed;
+        }
+        
+        if (mouse.leftButton.wasReleasedThisFrame)
+        {
+            blockSpeed = blockFallSpeed;
         }
     }
     
@@ -124,21 +162,30 @@ public class PlayerController : MonoBehaviour
             levelGridManager.SetCell(x, y, color);
         }
     }
-    
-    // Handle left mouse click - FILL YOUR CODE HERE
-    private void OnLeftMouseClick(Vector2Int gridPosition)
+
+    // Update block falling over time
+    private void UpdateBlockFalling()
     {
-        // TODO: Add your left-click logic here
-        // gridPosition contains the grid coordinates where the mouse was clicked
-        // This position is already offset 5 cells above the player
+        fallTimer += Time.deltaTime;
         
-        // Example actions you might want to do:
-        // - Place a permanent block
-        // - Toggle a block on/off
-        // - Trigger an action
-        // - Spawn an object
-        // - etc.
-        
-        Debug.Log("Left click at grid position: " + gridPosition);
+        // Calculate new height based on fall speed
+        if (fallTimer >= blockSpeed)
+        {
+            currentBlockHeight = currentBlockHeight - 1;
+            fallTimer = 0f;
+        }
+        // Prevent going below 0
+        if (currentBlockHeight < 0)
+        {
+            currentBlockHeight = 0;
+        }
+    }
+    
+    // Reset block height to initial value
+    public void ResetBlockHeight()
+    {
+        currentBlockHeight = initialBlocHeight;
+        fallTimer = 0f;
+        blockSpeed = blockFallSpeed;
     }
 } 
