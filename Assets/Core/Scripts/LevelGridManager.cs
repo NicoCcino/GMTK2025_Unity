@@ -137,6 +137,14 @@ public class LevelGridManager : MonoBehaviour
         }
     }
 
+    public Vector2Int GetPlayerGridPosition()
+    {
+        Vector3 pos = player.transform.position;
+        playerGridPosition = WorldToGrid(pos);
+        Debug.Log($"Player Grid Position: {playerGridPosition}");
+        return playerGridPosition;
+    }
+
     float GetMaxFloorXExcept(GameObject exclude)
     {
         float maxX = -1000f; // Valeur initiale très basse
