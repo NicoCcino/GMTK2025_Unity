@@ -55,19 +55,79 @@ public class LevelGridManager : MonoBehaviour
         }
     }
 
-    public void BlockHit(int x, int y, BlockData blockData){
-        // Placement du bloc en 3D dans le monde
-        Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
-        GameObject newBlockGO = Instantiate(currentBlockPrefab, worldPos, Quaternion.identity, this.transform);
+    public void BlockHit(int gridHitX, int gridHitY, BlockData blockData, int blockHitX, int blockHitY, int blockRotation = 0)
+    {
+        // gridHit représente les coordonnées de la grille où le bloc a été touché
+
+        // blockHit représente les coordonnées de la cellule dans le bloc (qui a touché)
+        // Par exemple pour un bloc T:
+        //
+
+        // On peut ajouter ici la logique de ce qui se passe quand le bloc est touché
+        Debug.Log($"Block hit ground at ({gridHitX}, {gridHitY}) with block data: {blockData.blockName}");
+
+        // Placement de l'objet 3D
+
+        // Placement du centre du bloc
+        int pivotX = gridHitX - blockHitX;
+        int pivotY = gridHitY - blockHitY;
+
+        GameObject newBlockGO = DrawBlock(gridHitX, gridHitY, blockData.blockPrefab, blockRotation);
+
+
+        // Update des cellules dans la grille
+
+
+        for (int i = 0; i < blockData.shape.Length; i++)
+        {
+            bool cellIsSolid = blockData.shape[i];
+            if (!cellIsSolid) continue;
+
+            int localX = i % 3;     // Colonne (0 à 2)
+            int localY = i / 3;     // Ligne   (0 à 2)
+
+            int rotX = localX;
+            int rotY = localY;
+
+            // Appliquer la rotation
+            switch (blockRotation % 360)
+            {
+                case 90:
+                    rotX = 2 - localY;
+                    rotY = localX;
+                    break;
+                case 180:
+                    rotX = 2 - localX;
+                    rotY = 2 - localY;
+                    break;
+                case 270:
+                    rotX = localY;
+                    rotY = 2 - localX;
+                    break;
+                    // 0 ou valeur par défaut : aucune rotation
+            }
+
+            int gridX = pivotX + rotX;
+            int gridY = pivotY + rotY;
+
+            // Mise à jour de la grille de cellules:
+            LevelGrid.grid[gridX, gridY] = new Cell(newBlockGO, new Vector2Int(gridX, gridY), blockData.color);
+            Debug.Log($"→ Cellule placée en ({gridX}, {gridY})");
+        }
     }
 
-    public GameObject DrawBlock(int x, int y, GameObject blockPrefab)
+    public GameObject DrawBlock(int x, int y, GameObject blockPrefab, int blockRotation = 0)
     {
         // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
         worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
-        GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
+
+
+        // Applique une rotation selon Z (Unity fonctionne avec Z vers l'écran en 2D vue de dessus)
+        Quaternion rotation = Quaternion.Euler(0f, 0f, blockRotation);
+
+        // Place le bloc
+        GameObject newBlockGO = Instantiate(blockPrefab, worldPos, rotation, this.transform);
 
         // Gestion du parentage du bloc au sol
         foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
@@ -228,7 +288,7 @@ public class LevelGridManager : MonoBehaviour
 
     int CountValueInColumn(int column)
     {
-        int count = 0;  
+        int count = 0;
         for (int y = 0; y < LevelGrid.gridHeight; y++)
         {
             Cell block = LevelGrid.grid[column, y];
