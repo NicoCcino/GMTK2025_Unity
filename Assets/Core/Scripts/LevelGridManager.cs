@@ -72,10 +72,10 @@ public class LevelGridManager : MonoBehaviour
 
     public Vector3 GridToWorld(int x, int y)
     {
-        Vector3 worldPosition = new Vector3(x, y, 0);
-        // On ajoute l'offset de la grille
-        worldPosition += gridOrigin.position;
+        Vector3 worldPosition = new Vector3(x + gridOrigin.position.x, y, 0);         // On ajoute l'offset de la grille
+        // Debug.Log($"Grid to World: ({x}, {y}) -> {worldPosition}");
         return worldPosition;
+
     }
 
     public Vector2Int WorldToGrid(Vector3 position)
@@ -87,6 +87,7 @@ public class LevelGridManager : MonoBehaviour
         {
             gridPosition.x -= LevelGrid.gridWidth;
         }
+        // Debug.Log($"World to Grid: {position} -> ({gridPosition.x}, {gridPosition.y})");
         return gridPosition;
     }
 
@@ -102,8 +103,6 @@ public class LevelGridManager : MonoBehaviour
             for (int y = 0; y < LevelGrid.gridHeight - 1; y++)
             {
                 Vector3 pos = GridToWorld(x, y) + new Vector3(cellSize, cellSize, 0) * 0.5f;
-                // Add offset based on the grid position in the world
-                pos += gridOrigin.position;
                 Gizmos.DrawWireCube(pos, new Vector3(cellSize, cellSize, 0.1f));
 
 
@@ -167,6 +166,14 @@ public class LevelGridManager : MonoBehaviour
         SetCell(1, 1, Color.red);
         SetCell(52, 1, Color.red);
         SetCell(52, 0, Color.red);
+
+        Debug.Log($"World to Grid: (1,1,0) -> {WorldToGrid(new Vector3(1, 1, 0))}");
+        Debug.Log($"World to Grid: (-1,1,0) -> {WorldToGrid(new Vector3(-1, 1, 0))}");
+        Debug.Log($"World to Grid: (50,50,0) -> {WorldToGrid(new Vector3(50, 50, 0))}");
+        Debug.Log($"World to Grid: (99,1,0) -> {WorldToGrid(new Vector3(99, 1, 0))}");
+        Debug.Log($"World to Grid: (150,1,0) -> {WorldToGrid(new Vector3(150, 1, 0))}");
+
+
     }
 
     // Update is called once per frame
