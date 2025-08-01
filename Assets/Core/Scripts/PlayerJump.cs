@@ -1,20 +1,30 @@
 using UnityEngine;
 
+public enum PlayerState
+{
+    Stable,
+    Ascending,
+    Descending
+}
+
 public class PlayerJump : MonoBehaviour
 {
     public float jumpHeight = 3f;
     public float jumpDuration = 0.5f;
+    public float gravity = 20f; // Gravity strength for realistic parabolic motion
 
-    private bool isJumping = false;
+    private PlayerState currentState = PlayerState.Stable;
     private float jumpTime = 0f;
     private float startY;
+    private float initialVelocity = 0f;
+    private float currentVelocity = 0f;
 
     private float lastHeightOffset = 0;
-
 
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
     public LevelGridManager levelGridManager;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -26,74 +36,131 @@ public class PlayerJump : MonoBehaviour
     {
         Vector2Int playerGridPosition;
         playerGridPosition = levelGridManager.GetPlayerGridPosition();
-        Debug.Log("Player Grid Position: " + playerGridPosition);
-        if ((LevelGrid.grid[playerGridPosition.x + 1, playerGridPosition.y] != null) && !isJumping)
+        
+        // Check if player have to jump
+        if ((LevelGrid.grid[playerGridPosition.x + 1, playerGridPosition.y] != null) && currentState == PlayerState.Stable)
         {
             Debug.Log("Player can jump");
             StartJump();
         }
 
-        if (isJumping)
+        // Check if player should be falling (no support underneath)
+        if (currentState == PlayerState.Stable)
         {
-            UpdateJump();
+            CheckForFalling(playerGridPosition);
         }
 
+        // Call appropriate updater based on state
+        switch (currentState)
+        {
+            case PlayerState.Ascending:
+                UpdateAscending();
+                break;
+            case PlayerState.Descending:
+                UpdateDescending();
+                break;
+            case PlayerState.Stable:
+                UpdateStable();
+                break;
+        }
+    }
+
+    void CheckForFalling(Vector2Int playerGridPosition)
+    {
+        // Check if there's no block underneath and not at ground level
+        bool hasSupport = (playerGridPosition.y == 0) || (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y - 1] != null);
+        
+        if (!hasSupport)
+        {
+            Debug.Log("Player is falling - no support underneath");
+            StartDescending();
+        }
+    }
+
+    void StartDescending()
+    {
+        currentState = PlayerState.Descending;
+        startY = transform.position.y;
+        currentVelocity = 0f; // Start falling from rest
     }
 
     void StartJump()
     {
-        isJumping = true;
+        currentState = PlayerState.Ascending;
         jumpTime = 0f;
         startY = transform.position.y;
+        
+        // Calculate initial velocity for parabolic jump
+        // Using physics formula: v = sqrt(2 * g * h) where h is jump height
+        initialVelocity = Mathf.Sqrt(2f * gravity * jumpHeight);
+        currentVelocity = initialVelocity;
     }
 
-    void UpdateJump()
+    void UpdateStable()
+    {
+        // Player is stable on ground or block, no movement needed
+        // This function can be used for any stable state logic if needed
+    }
+
+    void UpdateAscending()
     {
         jumpTime += Time.deltaTime;
-        float t = jumpTime / jumpDuration;
-        Vector2Int playerGridPosition;
-        playerGridPosition = levelGridManager.GetPlayerGridPosition();
-
-        // Courbe parabolique simple (0 → 1 → 0)
-        float heightOffset = 4 * jumpHeight * t * (1 - t);
+        
+        // Apply gravity to create parabolic motion
+        currentVelocity -= gravity * Time.deltaTime;
+        
         Vector3 pos = transform.position;
-        pos.y = startY + heightOffset;
+        pos.y += currentVelocity * Time.deltaTime;
         transform.position = pos;
-        lastHeightOffset = heightOffset;
-
-        // Check if player has landed
-        if ((heightOffset < lastHeightOffset) && lastHeightOffset > 0)
+        
+        // Check if we've reached the peak (velocity becomes negative)
+        if (currentVelocity <= 0)
         {
-            CheckStopJump();
-            Debug.Log("Check Stop Jump");
+            Debug.Log("Reached jump peak, transitioning to descending");
+            currentState = PlayerState.Descending;
         }
+        
+        lastHeightOffset = pos.y - startY;
     }
 
-    void CheckStopJump()
+    void UpdateDescending()
     {
-        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        Debug.Log("Update Descending");
+        Vector3 pos = transform.position;
         
-        // Check if player has landed on ground or on a block
-        if ((playerGridPosition.y == 0) || (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y - 1] != null))
+        // Check if player has landed
+        // Check the player position with a margin of 0.5f to have the bottom of the player touching the ground
+        if (pos.y <= 0.5f)
         {
-            Debug.Log("Player has landed at " + playerGridPosition.y);
-            
-            // End the jump
-            isJumping = false;
-            
-            // Adjust position to be above the grid
-            Vector3 pos = transform.position;
-            Debug.Log("Player has landed at grid Y: " + playerGridPosition.y);
-            
-            // Debug: Check grid origin and world conversion
-            Vector3 worldPos = levelGridManager.GridToWorld(playerGridPosition.x, playerGridPosition.y);
-            Debug.Log("Grid origin: " + levelGridManager.gridOrigin.position);
-            Debug.Log("Grid to world conversion: (" + playerGridPosition.x + "," + playerGridPosition.y + ") -> " + worldPos);
-            Debug.Log("Current player world position: " + transform.position);
-            
-            pos.y = worldPos.y + 0.5f;
-            Debug.Log("Final landing position Y: " + pos.y);
-            transform.position = pos;
+            Debug.Log("Player has landed on the ground");
+            StopDescending();
+            return;
         }
+        
+        Vector2Int playerGridPosition = levelGridManager.WorldToGrid(new Vector3(pos.x, pos.y - 0.5f, 0));
+        if (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y] != null)
+        {
+            Debug.Log("Player has landed on a block");
+            StopDescending();
+            return;
+        }
+        
+        // Realistic falling with gravity
+        currentVelocity += gravity * Time.deltaTime;
+        pos.y -= currentVelocity * Time.deltaTime;
+        transform.position = pos;
+    }
+
+    void StopDescending()
+    {
+        currentState = PlayerState.Stable;
+        currentVelocity = 0f;
+        
+        // Adjust position to be above the grid
+        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        Vector3 pos = transform.position;
+        Vector3 worldPos = levelGridManager.GridToWorld(playerGridPosition.x, playerGridPosition.y);
+        pos.y = worldPos.y + 0.5f;
+        transform.position = pos;
     }
 }
