@@ -7,7 +7,7 @@ public class LevelGridManager : MonoBehaviour
 
     [Header("Blocks Settings")]
     public GameObject blockPrefab;
-    public float blockHeightOffset = 0.5f;
+    public float blockHeightOffset = -1;
 
     public GameObject floorPrefab;
     public float floorWidth = 50f;
