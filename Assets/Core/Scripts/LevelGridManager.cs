@@ -18,6 +18,8 @@ public class LevelGridManager : MonoBehaviour
 
     public GameObject player;
     public Vector2Int playerGridPosition;
+    static int currentPlayerColumn = -1; // Variable pour suivre la colonne actuelle du joueur
+    private MoneyManager moneyManager;
 
     // Gizmo settings for visualizing the grid in the editor
     [Header("Gizmo Settings")]
@@ -45,7 +47,7 @@ public class LevelGridManager : MonoBehaviour
 
         // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f ; // Center the block in the cell
+        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
         GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
         Block newBlock = new Block(newBlockGO, new Vector2Int(x, y), color);
 
@@ -186,10 +188,38 @@ public class LevelGridManager : MonoBehaviour
         return maxX;
     }
 
+    int CountValueInColumn(int column)
+    {
+        int count = 0;  
+        for (int y = 0; y < LevelGrid.gridHeight; y++)
+        {
+            Block block = LevelGrid.grid[column, y];
+            if (block != null)
+            {
+                count += block.value; // On additionne la valeur du bloc
+            }
+        }
+        return count;
+    }
+
+    void PlayerEntersNewColumn(int newCol)
+    {
+        // Logique pour gérer l'entrée du joueur dans une nouvelle colonne
+        Debug.Log("Player entered a new column at: " + playerGridPosition);
+        // Ici, vous pouvez ajouter des actions spécifiques à effectuer lorsque le joueur entre dans une nouvelle colonne
+
+
+        currentPlayerColumn = newCol;
+        int blocksInColumn = CountValueInColumn(newCol);
+        moneyManager.AddMoney(blocksInColumn);
+        Debug.Log($"Nouvelle colonne {newCol} : +{blocksInColumn} argent. Total: {moneyManager.money}");
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         player = GameObject.Find("PlayerPivot");
+        moneyManager = GameObject.Find("MoneyManager").GetComponent<MoneyManager>();
         SetCell(10, 0, Color.red);
         SetCell(52, 1, Color.red);
         SetCell(52, 0, Color.red);
@@ -209,5 +239,12 @@ public class LevelGridManager : MonoBehaviour
     {
         playerGridPosition = WorldToGrid(player.transform.position);
         MoveChunkToFront();
+
+
+        int newCol = playerGridPosition.x;
+        if (newCol != currentPlayerColumn)
+        {
+            PlayerEntersNewColumn(newCol);
+        }
     }
 }

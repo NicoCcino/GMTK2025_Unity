@@ -16,8 +16,32 @@ public class MoneyManager : MonoBehaviour
 
     }
 
+    public void AddMoney(int amount)
+    {
+        // Method to add money to the player's total
+        money += amount;
+        Debug.Log("Money added: " + amount + ". Total Money: " + money);
+        DisplayMoney();
+    }
+
+    void RemoveMoney(int amount)
+    {
+        // Method to remove money from the player's total
+        if (money >= amount)
+        {
+            money -= amount;
+            Debug.Log("Money removed: " + amount + ". Total Money: " + money);
+
+            DisplayMoney();
+        }
+        else
+        {
+            Debug.LogWarning("Not enough money to remove: " + amount + ". Current Money: " + money);
+        }
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+        void Start()
     {
 
     }
