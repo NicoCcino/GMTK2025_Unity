@@ -97,12 +97,37 @@ public class PlayerController : MonoBehaviour
             mouseWorldPos = ray.origin + ray.direction * distance;
             mouseWorldPos.z = 0;
         }
-        Vector2Int mouseGridPos = lastMouseGridPosition;
-        Debug.Log("lastMouseGridPosition: " + lastMouseGridPosition);
-        if (LevelGrid.grid[lastMouseGridPosition.x+1, lastMouseGridPosition.y] == null)
+        // Convert world position to grid position using LevelGridManager's WorldToGrid function
+        Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
+        
+        // Check for block collision on the right side (with grid wrapping)
+        int x = lastMouseGridPosition.x + 1;
+        if (x > LevelGrid.gridWidth - 1)
         {
-            // Convert world position to grid position using LevelGridManager's WorldToGrid function
-            mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
+            x = 0; // Wrap to the left side of the grid
+        }
+        if (LevelGrid.grid[x, lastMouseGridPosition.y] != null)
+        {
+            // If there's a block on the right, prevent moving past it
+            if (mouseGridPos.x > lastMouseGridPosition.x)
+            {
+                mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
+            }
+        }
+        
+        // Check for block collision on the left side (with grid wrapping)
+        x = lastMouseGridPosition.x - 1;
+        if (x < 0)
+        {
+            x = LevelGrid.gridWidth - 1; // Wrap to the right side of the grid
+        }
+        if (LevelGrid.grid[x, lastMouseGridPosition.y] != null)
+        {
+            // If there's a block on the left, prevent moving past it
+            if (mouseGridPos.x < lastMouseGridPosition.x)
+            {
+                mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
+            }
         }
         Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
         mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
@@ -115,7 +140,6 @@ public class PlayerController : MonoBehaviour
             mouseGridPos = new Vector2Int(mouseGridPos.x, 0);
         }
 
-        Debug.Log("mouseGridPos: " + mouseGridPos);
         // Only update if the grid position has changed
         if (mouseGridPos != lastMouseGridPosition)
         {
@@ -139,7 +163,7 @@ public class PlayerController : MonoBehaviour
                 lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
             }
         // if cell under mouseGridPos is set
-        if (LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null)
+        if (mouseGridPos.y - 1 >= 0 && LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null)
         {
             // The cell under mouseGridPos is set
             ResetBlockHeight();
