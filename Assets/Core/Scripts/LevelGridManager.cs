@@ -163,7 +163,7 @@ public class LevelGridManager : MonoBehaviour
     void Start()
     {
         player = GameObject.Find("PlayerPivot");
-        SetCell(1, 1, Color.red);
+        SetCell(10, 0, Color.red);
         SetCell(52, 1, Color.red);
         SetCell(52, 0, Color.red);
 
