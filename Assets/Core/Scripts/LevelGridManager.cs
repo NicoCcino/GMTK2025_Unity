@@ -5,6 +5,8 @@ public class LevelGridManager : MonoBehaviour
 {
 
     public GameObject blockPrefab;
+    public GameObject floorPrefab;
+    public float floorWidth = 50f;
 
     // Player reference and grid position
     [Header("Player Settings")]
@@ -18,6 +20,7 @@ public class LevelGridManager : MonoBehaviour
     [Tooltip("Color of the grid gizmos")]
     public Color gizmoColor = Color.gray;
     public float cellSize = 1f;
+    public Transform origin;
 
     public void SetCell(int x, int y, Color color)
     {
@@ -28,10 +31,23 @@ public class LevelGridManager : MonoBehaviour
             Destroy(LevelGrid.grid[x, y].gameObject);
         }
 
+
         Vector3 worldPos = GridToWorld(x, y);
         worldPos += new Vector3(cellSize, cellSize, 0) * 0.5f; // Center the block in the cell
         GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
         Block newBlock = new Block(newBlockGO, new Vector2Int(x, y), color);
+
+
+        // Gestion du parentage du bloc au sol
+        foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor")){
+            if (worldPos.x >= floor.transform.position.x && worldPos.x < floor.transform.position.x + floorWidth)
+            { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
+                newBlock.gameObject.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
+                break;
+            }
+        }
+        
+
 
         LevelGrid.grid[x, y] = newBlock;
     }
@@ -69,7 +85,10 @@ public class LevelGridManager : MonoBehaviour
             for (int y = 0; y < LevelGrid.gridHeight - 1; y++)
             {
                 Vector3 pos = GridToWorld(x, y) + new Vector3(cellSize, cellSize, 0) * 0.5f;
+                // Add offset based on the grid position in the world
+                pos += origin.position;
                 Gizmos.DrawWireCube(pos, new Vector3(cellSize, cellSize, 0.1f));
+
 
 #if UNITY_EDITOR
                 // Affiche 0 ou 1 selon présence d'un bloc
