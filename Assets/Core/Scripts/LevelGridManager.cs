@@ -4,7 +4,11 @@ using UnityEditor;
 public class LevelGridManager : MonoBehaviour
 {
 
+
+    [Header("Blocks Settings")]
     public GameObject blockPrefab;
+    public float blockHeightOffset = 0.5f;
+
     public GameObject floorPrefab;
     public float floorWidth = 50f;
 
@@ -41,7 +45,7 @@ public class LevelGridManager : MonoBehaviour
 
         // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(cellSize, cellSize, 0) * 0.5f; // Center the block in the cell
+        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f ; // Center the block in the cell
         GameObject newBlockGO = Instantiate(blockPrefab, worldPos, Quaternion.identity, this.transform);
         Block newBlock = new Block(newBlockGO, new Vector2Int(x, y), color);
 
