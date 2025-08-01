@@ -102,6 +102,12 @@ public class PlayerController : MonoBehaviour
             // Update last position
             lastMouseGridPosition = mouseGridPos;
         }
+        
+        // Handle left mouse click
+        if (mouse.leftButton.wasPressedThisFrame)
+        {
+            OnLeftMouseClick(mouseGridPos);
+        }
     }
     
     // Public method to get the current mouse grid position
@@ -117,5 +123,22 @@ public class PlayerController : MonoBehaviour
         {
             levelGridManager.SetCell(x, y, color);
         }
+    }
+    
+    // Handle left mouse click - FILL YOUR CODE HERE
+    private void OnLeftMouseClick(Vector2Int gridPosition)
+    {
+        // TODO: Add your left-click logic here
+        // gridPosition contains the grid coordinates where the mouse was clicked
+        // This position is already offset 5 cells above the player
+        
+        // Example actions you might want to do:
+        // - Place a permanent block
+        // - Toggle a block on/off
+        // - Trigger an action
+        // - Spawn an object
+        // - etc.
+        
+        Debug.Log("Left click at grid position: " + gridPosition);
     }
 } 
