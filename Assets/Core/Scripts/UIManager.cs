@@ -1,0 +1,73 @@
+using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
+
+public class UIManager : MonoBehaviour
+{
+    [Header("Player Settings")]
+    [Tooltip("Reference to the Player GameObject")]
+    public GameObject player;
+
+    [Header("Money Manager")]
+    [Tooltip("Reference to the Money Manager")]
+    public MoneyManager moneyManager;
+
+
+    [Header("Game Over Screen")]
+    [Tooltip("Reference to the Game Over screen UI")]
+    public GameObject gameOverScreen;
+    public TextMeshProUGUI textScoreSentence; // Reference to a UI Text component to display the score sentence
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        if (gameOverScreen = null)
+        {
+            Debug.LogError("Game Over Screen is not assigned in the UIManager.");
+
+            Debug.LogError("Trying to find Game Over screen in the scene, by name Panel_GameOver");
+            gameOverScreen = GameObject.Find("Panel_GameOver");
+        }
+        if (textScoreSentence = null)
+        {
+            Debug.LogError("Text Score Sentence is not assigned in the UIManager.");
+
+            Debug.LogError("Trying to find Text Score Sentence in the scene, by name Text_ScoreSentence");
+            textScoreSentence = GameObject.Find("Text_ScoreSentence").GetComponent<TextMeshProUGUI>();
+        }
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Script_Move_World.isPlayerDead)
+        {
+            ShowGameOverScreen();
+        }
+
+    }
+
+    public void ShowGameOverScreen()
+    {
+        // Logic to show the game over screen
+        Debug.Log("Game Over! Showing Game Over Screen.");
+        // Here you enable a UI panel and display the score or any other relevant information
+        if (gameOverScreen != null)
+        {
+            gameOverScreen.SetActive(true);
+            string textScoreString = $"You have walked over {moneyManager.score} blocks: ";
+            textScoreSentence.text = textScoreString;
+        }
+    }   
+
+    public void HideGameOverScreen()
+    {
+        // Logic to hide the game over screen
+        Debug.Log("Hiding Game Over Screen.");
+        // Here you would typically disable a UI panel or similar
+        if (gameOverScreen != null)
+        {
+            gameOverScreen.SetActive(false);
+        }
+    }   
+}

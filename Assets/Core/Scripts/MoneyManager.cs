@@ -6,6 +6,7 @@ public class MoneyManager : MonoBehaviour
 {
 
     public int money = 0; // Amount of money the player has
+    public int score = 0; // Player's score, can be used for other purposes
     public TextMeshProUGUI moneyText; // Reference to a UI Text component to display the money
 
     void DisplayMoney()
@@ -20,6 +21,7 @@ public class MoneyManager : MonoBehaviour
     {
         // Method to add money to the player's total
         money += amount;
+        score += amount; // Le score s'incrémente en même temps que l'argent (mais lui ne diminue jamais)
         Debug.Log("Money added: " + amount + ". Total Money: " + money);
         DisplayMoney();
     }
