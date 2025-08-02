@@ -35,66 +35,66 @@ public class LevelGridManager : MonoBehaviour
 
     public float minDistanceToTeleportChunk = 50f;
 
-    public void BlockHit(int gridHitX, int gridHitY, BlockData blockData, int blockHitX, int blockHitY, int blockRotation = 0)
-    {
-        // gridHit représente les coordonnées de la grille où le bloc a été touché
+    // public void BlockHit(int gridHitX, int gridHitY, BlockData blockData, int blockHitX, int blockHitY, int blockRotation = 0)
+    // {
+    //     // gridHit représente les coordonnées de la grille où le bloc a été touché
 
-        // blockHit représente les coordonnées de la cellule dans le bloc (qui a touché)
-        // Par exemple pour un bloc T:
-        //
+    //     // blockHit représente les coordonnées de la cellule dans le bloc (qui a touché)
+    //     // Par exemple pour un bloc T:
+    //     //
 
-        // On peut ajouter ici la logique de ce qui se passe quand le bloc est touché
-        Debug.Log($"Block hit ground at ({gridHitX}, {gridHitY}) with block data: {blockData.blockName}");
+    //     // On peut ajouter ici la logique de ce qui se passe quand le bloc est touché
+    //     Debug.Log($"Block hit ground at ({gridHitX}, {gridHitY}) with block data: {blockData.blockName}");
 
-        // Placement de l'objet 3D
+    //     // Placement de l'objet 3D
 
-        // Placement du centre du bloc
-        int pivotX = gridHitX - blockHitX;
-        int pivotY = gridHitY - blockHitY;
+    //     // Placement du centre du bloc
+    //     int pivotX = gridHitX - blockHitX;
+    //     int pivotY = gridHitY - blockHitY;
 
-        GameObject newBlockGO = DrawBlock(gridHitX, gridHitY, blockData.blockPrefab, blockRotation);
-
-
-        // Update des cellules dans la grille
+    //     GameObject newBlockGO = DrawBlock(gridHitX, gridHitY, blockData.blockPrefab, blockRotation);
 
 
-        for (int i = 0; i < blockData.shape.Length; i++)
-        {
-            bool cellIsSolid = blockData.shape[i];
-            if (!cellIsSolid) continue;
+    //     // Update des cellules dans la grille
 
-            int localX = i % 3;     // Colonne (0 à 2)
-            int localY = i / 3;     // Ligne   (0 à 2)
 
-            int rotX = localX;
-            int rotY = localY;
+    //     for (int i = 0; i < blockData.shape.Length; i++)
+    //     {
+    //         bool cellIsSolid = blockData.shape[i];
+    //         if (!cellIsSolid) continue;
 
-            // Appliquer la rotation
-            switch (blockRotation % 360)
-            {
-                case 90:
-                    rotX = 2 - localY;
-                    rotY = localX;
-                    break;
-                case 180:
-                    rotX = 2 - localX;
-                    rotY = 2 - localY;
-                    break;
-                case 270:
-                    rotX = localY;
-                    rotY = 2 - localX;
-                    break;
-                    // 0 ou valeur par défaut : aucune rotation
-            }
+    //         int localX = i % 3;     // Colonne (0 à 2)
+    //         int localY = i / 3;     // Ligne   (0 à 2)
 
-            int gridX = pivotX + rotX;
-            int gridY = pivotY + rotY;
+    //         int rotX = localX;
+    //         int rotY = localY;
 
-            // Mise à jour de la grille de cellules:
-            LevelGrid.grid[gridX, gridY] = new Cell(newBlockGO, new Vector2Int(gridX, gridY), blockData.color);
-            Debug.Log($"→ Cellule placée en ({gridX}, {gridY})");
-        }
-    }
+    //         // Appliquer la rotation
+    //         switch (blockRotation % 360)
+    //         {
+    //             case 90:
+    //                 rotX = 2 - localY;
+    //                 rotY = localX;
+    //                 break;
+    //             case 180:
+    //                 rotX = 2 - localX;
+    //                 rotY = 2 - localY;
+    //                 break;
+    //             case 270:
+    //                 rotX = localY;
+    //                 rotY = 2 - localX;
+    //                 break;
+    //                 // 0 ou valeur par défaut : aucune rotation
+    //         }
+
+    //         int gridX = pivotX + rotX;
+    //         int gridY = pivotY + rotY;
+
+    //         // Mise à jour de la grille de cellules:
+    //         LevelGrid.grid[gridX, gridY] = new Cell(newBlockGO, new Vector2Int(gridX, gridY), blockData.color);
+    //         Debug.Log($"→ Cellule placée en ({gridX}, {gridY})");
+    //     }
+    // }
 
     public GameObject DrawBlock(int x, int y, GameObject blockPrefab, int blockRotation = 0)
     {
@@ -125,7 +125,7 @@ public class LevelGridManager : MonoBehaviour
     public void MoveDrawBlock(int currentPosX, int currentPosY, int newPosX, int newPosY)
     {
         //Récupère le bloc à déplacer
-        GameObject blockPrefab = LevelGrid.grid[currentPosX, currentPosY].gameObject;
+        GameObject blockPrefab = LevelGrid.grid[currentPosX, currentPosY].blockGO;
         // Déplace le bloc sur sa nouvelle position
         blockPrefab.transform.position = GridToWorld(newPosX, newPosY) + new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
 
@@ -144,7 +144,40 @@ public class LevelGridManager : MonoBehaviour
         }
     }
 
-    public void SetCell(int x, int y, GameObject blockPrefab, bool isSolid, Color color)
+    public void SetBlock(int x, int y, GameObject blockPrefab, BlockData blockData)
+    {
+
+        // Le pivot du bloc est au centre de la matrice 3x3
+        // On va donc placer les cellules du bloc autour de ce pivot
+
+        int offsetX = 1;
+        int offsetY = 1;
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                int worldX = x + (i - offsetX); // Position globale centrée
+                int worldY = y + (j - offsetY); // Position globale centrée
+
+                if (!LevelGrid.InBounds(worldX, worldY)) continue;
+
+                Cell blockCell = blockData.blockMatrix[i, j];
+
+                // Clone la cellule pour éviter les références partagées
+                Cell cellInstance = new Cell(
+                    blockCell.blockGO,
+                    blockData,
+                    new Vector2Int(i, j)
+                );
+                SetCell(worldX,worldY, cellInstance.blockGO, cellInstance.blockData, cellInstance.positionInBlockDataMatrix);
+            }
+        }
+
+
+    }
+
+    public void SetCell(int x, int y, GameObject blockPrefab, BlockData blockData, Vector2Int posInBlockDataMatrix)
     {
         // Check if the coordinates are within bounds
         if (!LevelGrid.InBounds(x, y)) return;
@@ -152,16 +185,15 @@ public class LevelGridManager : MonoBehaviour
         // If there's already a drawn block at this position, destroy it
         if (LevelGrid.grid[x, y] != null)
         {
-            Destroy(LevelGrid.grid[x, y].gameObject);
+            Destroy(LevelGrid.grid[x, y].blockGO);
         }
 
         // GameObject newBlockGO = DrawBlock(x, y, currentBlockData.blockPrefab);
 
         // Gestion des cellules dans grille
-        Cell newCell = new Cell(blockPrefab, new Vector2Int(x, y), color);
+        Cell newCell = new Cell(blockPrefab, blockData, posInBlockDataMatrix);
 
         // Enregistrement du bloc dans la grille
-        newCell.isSolid = isSolid; // On marque la cellule comme solide ou non
         LevelGrid.grid[x, y] = newCell;
     }
 
@@ -179,7 +211,7 @@ public class LevelGridManager : MonoBehaviour
 
         if (LevelGrid.grid[x, y] != null)
         {
-            Destroy(LevelGrid.grid[x, y].gameObject);
+            Destroy(LevelGrid.grid[x, y].blockGO); // Destroy the GameObject if it exists
             LevelGrid.grid[x, y] = null;
         }
     }
@@ -340,7 +372,7 @@ public class LevelGridManager : MonoBehaviour
             {
                 if (LevelGrid.grid[x, y] != null)
                 {
-                    Destroy(LevelGrid.grid[x, y].gameObject);
+                    Destroy(LevelGrid.grid[x, y].blockGO); // On détruit le GameObject du bloc
                     LevelGrid.grid[x, y] = null; // On vide la cellule de la grille
                 }
             }
@@ -349,7 +381,7 @@ public class LevelGridManager : MonoBehaviour
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
+    void Start()
     {
         EmptyGrid();
         player = GameObject.Find("PlayerPivot");

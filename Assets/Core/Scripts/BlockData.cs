@@ -1,12 +1,34 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New BlockData", menuName = "Block/BlockData")]
-public class BlockData : ScriptableObject
+public class BlockData : MonoBehaviour
 {
-    public string blockName = "New Block";
-    public GameObject blockPrefab; // Le prefab du bloc
-    public Color color = Color.white;
+    public string blockName = "BaseBlock";
+    public GameObject blockPrefab;
 
-    [Tooltip("16 éléments pour la forme 3x3 (ligne par ligne)")]
-    public bool[] shape = new bool[9];
+    public Cell[,] blockMatrix;
+
+    public BlockData()
+    {
+        blockMatrix = new Cell[3, 3];
+        //     InitializeMatrix();
+    }
+
+    protected virtual void InitializeMatrix()
+    {
+        for (int x = 0; x < 3; x++)
+        {
+            for (int y = 0; y < 3; y++)
+            {
+                blockMatrix[x, y] = new Cell(blockPrefab, this, new Vector2Int(x, y));
+            }
+
+        }
+
+    }
+
+    // Méthode virtuelle que les classes filles peuvent override
+    public virtual void Trigger(Vector2Int position, GameObject player)
+    {
+        Debug.Log($"Block {blockName} triggered at {position}");
+    }
 }

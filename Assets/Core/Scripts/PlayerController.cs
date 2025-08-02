@@ -221,7 +221,7 @@ public class PlayerController : MonoBehaviour
         if (levelGridManager != null && currentBlockData != null)
         {
             GameObject newBlock = levelGridManager.DrawBlock(x, y, currentBlockData.blockPrefab);
-            levelGridManager.SetCell(x, y, newBlock, true, color);
+            levelGridManager.SetCell(x, y, currentBlockData, true, color);
         }
     }
 
@@ -243,7 +243,7 @@ public class PlayerController : MonoBehaviour
     {
         // we reached the bottom of the grid, keep the bloc in position and reset the block height
         GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
-        levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, permanentBlock, true, cellColor);
+        levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData, true, cellColor);
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
         
