@@ -236,9 +236,18 @@ public class LevelGridManager : MonoBehaviour
 
 
 #if UNITY_EDITOR
+                int cellValue = 0;
                 // Affiche 0 ou 1 selon présence d'un bloc
-                int cellValue = LevelGrid.grid[x, y] != null ? 1 : 0;
+                if (LevelGrid.grid[x, y] != null)
+                {
+                    if (LevelGrid.grid[x, y].isSolid)
+                    {
+                        cellValue = 1; // Affiche 1 si la cellule est solide
+                    }
+                }
+                // Affiche la valeur de la cellule dans l'éditeur
                 Handles.Label(pos, cellValue.ToString());
+
 #endif
 
             }
