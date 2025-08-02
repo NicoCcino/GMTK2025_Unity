@@ -25,11 +25,13 @@ public class PlayerJump : MonoBehaviour
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
     public LevelGridManager levelGridManager;
-    
+
+    private PlayerAnimation PlayerAnimation;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        PlayerAnimation = FindFirstObjectByType<PlayerAnimation>();
     }
 
     // Update is called once per frame
@@ -108,11 +110,13 @@ public class PlayerJump : MonoBehaviour
         currentState = PlayerState.Ascending;
         jumpTime = 0f;
         startY = transform.position.y;
-        
+
         // Calculate initial velocity for parabolic jump
         // Using physics formula: v = sqrt(2 * g * h) where h is jump height
         initialVelocity = Mathf.Sqrt(2f * gravity * jumpHeight);
         currentVelocity = initialVelocity;
+
+        PlayerAnimation.SetJumpTrigger();
     }
 
     void UpdateStable()
@@ -171,12 +175,14 @@ public class PlayerJump : MonoBehaviour
     {
         currentState = PlayerState.Stable;
         currentVelocity = 0f;
-        
+
         // Adjust position to be above the grid
         Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
         Vector3 pos = transform.position;
-        
+
         pos.y = playerGridPosition.y + 0.5f;
         transform.position = pos;
+        
+        PlayerAnimation.SetIdleTrigger();
     }
 }
