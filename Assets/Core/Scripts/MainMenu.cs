@@ -9,9 +9,9 @@ public class MainMenu : MonoBehaviour
     }
 
     // Method to quit the application
-   /* public void QuitGame()
+    public void QuitGame()
     {
         Application.Quit();
-        Debug.Log("Game is quitting...");
-    }*/
+        Debug.Log("Game is quitting");
+    }
 }
