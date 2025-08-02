@@ -31,8 +31,10 @@ public class PlayerController : MonoBehaviour
     private bool isBlockedLeft;
     private bool isBlockedRight;
     private bool shouldSnapBlock;
-    private Vector2Int snapMouseGridPos;
-    private Vector2Int snapPlayerPivotGridPos;
+    
+    // Timer to prevent early collision detection at startup
+    private float initializationDelay = 0.1f; // Small delay to prevent startup collision issues
+    private float startTime;
 
     void Start()
     {
@@ -48,6 +50,12 @@ public class PlayerController : MonoBehaviour
             levelGridManager = FindFirstObjectByType<LevelGridManager>();
         }
 
+        // Find UIManager if not assigned
+        if (uiManager == null)
+        {
+            uiManager = FindFirstObjectByType<UIManager>();
+        }
+
         // Initialize available blocks
         InitializeBlocks();
 
@@ -55,14 +63,15 @@ public class PlayerController : MonoBehaviour
         InitializeQueue();
 
         // Initialize last mouse grid position
-        lastMouseGridPosition = new Vector2Int(0, currentBlockHeight);
+        lastMouseGridPosition = new Vector2Int(5, currentBlockHeight);
 
         // Initialize block falling system
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
         blockSpeed = blockFallSpeed;
 
-
+        // Record start time for initialization delay
+        startTime = Time.time;
     }
 
     void Update()
@@ -182,36 +191,77 @@ public class PlayerController : MonoBehaviour
     void CollisionUpdate()
     {
         if (levelGridManager == null) return;
+        
+        // Prevent collision detection for a brief moment after startup to avoid immediate snapping
+        if (Time.time - startTime < initializationDelay) return;
+        bool haveSolidCell = false;
+        isBlockedLeft = false;
+        isBlockedRight = false;
+
+        for (int i = 0; i < 3; i++) // Pour chaque cellule de la matrice du bloc
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                // Convert matrix coordinates to world coordinates (center matrix[1,1] on mouse position)
+                Vector2Int cellWorldPos = new Vector2Int(lastMouseGridPosition.x + (i - 1), lastMouseGridPosition.y + (j - 1));
+                Cell cell = currentBlock.blockMatrix[i, j];
+                if (cell != null && cell.isSolid) // Si la cellule est solide
+                {
+                    haveSolidCell = true;
+                    // We have to check for collision from the matrix center
+                    if (!isBlockedLeft){
+                        isBlockedLeft = CellBlockedLeftOf(cellWorldPos.x, cellWorldPos.y);
+                    }
+                    if (!isBlockedRight){
+                        isBlockedRight = CellBlockedRightOf(cellWorldPos.x, cellWorldPos.y);
+                    }
+                    if (CellSnapBottomOf(cellWorldPos.x, cellWorldPos.y))
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (haveSolidCell)
+        {
+            return;
+        }
 
         // Update collision state based on current position
         isBlockedLeft = CellBlockedLeftOf(lastMouseGridPosition.x, lastMouseGridPosition.y);
         isBlockedRight = CellBlockedRightOf(lastMouseGridPosition.x, lastMouseGridPosition.y);
-
-        // Check for ground collision (block hitting bottom or another block below)
-        Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
-        Vector2Int currentBlockPos = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
-
-        // Store positions for potential snapping
-        snapMouseGridPos = lastMouseGridPosition;
-        snapPlayerPivotGridPos = PlayerPivotGridPos;
-
-        // Check if block should snap to ground
-        if ((PlayerPivotGridPos.y + currentBlockHeight <= 0) ||
-        (currentBlockPos.y - 1 >= 0 && LevelGrid.grid[currentBlockPos.x, currentBlockPos.y - 1] != null))
+        if (CellSnapBottomOf(lastMouseGridPosition.x, lastMouseGridPosition.y))
         {
-            SnapBlock(snapMouseGridPos, snapPlayerPivotGridPos);
             return;
         }
     }
 
     public bool CellBlockedRightOf(int x, int y)
     {
+        // Bounds check for Y coordinate
+        if (y < 0 || y >= LevelGrid.gridHeight)
+        {
+            return false; // Out of bounds, no collision
+        }
+        
         // Check for cell collision on the right side (with grid wrapping)
         int xChecked = x + 1;
-        if (xChecked > LevelGrid.gridWidth - 1)
+        
+        // Handle grid wrapping for X
+        if (xChecked >= LevelGrid.gridWidth)
         {
             xChecked = 0; // Wrap to the left side of the grid
         }
+        
+        // Bounds check for wrapped X coordinate
+        if (xChecked < 0 || xChecked >= LevelGrid.gridWidth)
+        {
+            return false; // Safety check
+        }
+        
+        Debug.Log($"CellBlockedRightOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
+        
         if (LevelGrid.grid[xChecked, y] != null)
         {
             return true; // There's a block on the right
@@ -221,17 +271,34 @@ public class PlayerController : MonoBehaviour
             return false; // No block on the right
         }
     }
+
     public bool CellBlockedLeftOf(int x, int y)
     {
+        // Bounds check for Y coordinate
+        if (y < 0 || y >= LevelGrid.gridHeight)
+        {
+            return false; // Out of bounds, no collision
+        }
+        
         // Check for block collision on the left side (with grid wrapping)
-        int xChecked = lastMouseGridPosition.x - 1;
+        int xChecked = x - 1;
+        
+        // Handle grid wrapping for X
         if (xChecked < 0)
         {
             xChecked = LevelGrid.gridWidth - 1; // Wrap to the right side of the grid
         }
+        
+        // Bounds check for wrapped X coordinate
+        if (xChecked < 0 || xChecked >= LevelGrid.gridWidth)
+        {
+            return false; // Safety check
+        }
+        
+        Debug.Log($"CellBlockedLeftOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
+        
         if (LevelGrid.grid[xChecked, y] != null)
         {
-
             return true; // There's a block on the left
         }
         else
@@ -240,6 +307,25 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public bool CellSnapBottomOf(int x, int y)
+    {
+        // Bounds check for X coordinate with wrapping
+        if (x < 0) x = LevelGrid.gridWidth - 1;
+        if (x >= LevelGrid.gridWidth) x = 0;
+        
+        // Check if block should snap to ground
+        if ((y <= 0) ||
+        (y - 1 >= 0 && y - 1 < LevelGrid.gridHeight && LevelGrid.InBounds(x, y - 1) && LevelGrid.grid[x, y - 1] != null))
+        {
+            Vector2Int snapGridPos = new Vector2Int(x, y);
+            SnapBlock(snapGridPos);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     // Public method to get the current mouse grid position
     public Vector2Int GetMouseGridPosition()
     {
@@ -261,8 +347,9 @@ public class PlayerController : MonoBehaviour
     }
 
     // Reset block height to initial value
-    public void SnapBlock(Vector2Int mouseGridPos, Vector2Int PlayerPivotGridPos)
+    public void SnapBlock(Vector2Int mouseGridPos)
     {
+        Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
         // we reached the bottom of the grid, keep the bloc in position and reset the block height
         if (currentBlock != null && currentBlock.blockPrefab != null)
         {
@@ -324,7 +411,7 @@ public class PlayerController : MonoBehaviour
     {
         availableBlocks = new Block[]
         {
-            new Block_JumpPad_1(),
+            // new Block_JumpPad_1(),
             new Block_T_5(),
             new Block_Simple_1()
         };
@@ -347,10 +434,28 @@ public class PlayerController : MonoBehaviour
         Debug.Log(blockQueue[1].blockName);
         Debug.Log(blockQueue[2].blockName);
 
-        uiManager.UpdateBlocksQueuePreview(blockQueue);
+        if (IsUIManagerReady())
+        {
+            uiManager.UpdateBlocksQueuePreview(blockQueue);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager not ready (missing or UI components not assigned), cannot update block queue preview");
+        }
     }
 
     public UIManager uiManager;
+
+    // Check if UIManager is properly configured with all required components
+    private bool IsUIManagerReady()
+    {
+        if (uiManager == null) return false;
+        
+        // Check if the preview images are assigned (required for UpdateBlocksQueuePreview)
+        return uiManager.previewBlockImage1 != null && 
+               uiManager.previewBlockImage2 != null && 
+               uiManager.previewBlockImage3 != null;
+    }
 
     public void AdvanceBlockQueue()
     {
@@ -368,7 +473,14 @@ public class PlayerController : MonoBehaviour
         currentBlock = blockQueue[0];
 
         // Met à jour les previews
-        uiManager.UpdateBlocksQueuePreview(blockQueue);
+        if (IsUIManagerReady())
+        {
+            uiManager.UpdateBlocksQueuePreview(blockQueue);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager not ready (missing or UI components not assigned), cannot update block queue preview");
+        }
     }
 
     public Block GetRandomBlock()
