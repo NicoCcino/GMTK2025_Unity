@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class Block_JumpPad_1 : Block
+public class Block_T_5 : Block
 {
-    public Block_JumpPad_1() : base("JumpPad", "Prefab_JumpPad_1")
+    public Block_T_5() : base("Block_T_5", "Prefab_Block_T_5")
     {
         // Set specific properties after base initialization
         if (blockMatrix != null)

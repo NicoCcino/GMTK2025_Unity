@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2072401702269979009}
   - component: {fileID: 7121805499720558194}
   m_Layer: 0
-  m_Name: Block_JumpPad_1
+  m_Name: Prefab_JumpPad_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

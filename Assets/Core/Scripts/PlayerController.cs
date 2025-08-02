@@ -329,6 +329,7 @@ public class PlayerController : MonoBehaviour
         availableBlocks = new Block[]
         {
             new Block_JumpPad_1(),
+            new Block_T_5(),
             new Block_Simple_1()
         };
         
