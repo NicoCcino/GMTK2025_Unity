@@ -35,66 +35,6 @@ public class LevelGridManager : MonoBehaviour
 
     public float minDistanceToTeleportChunk = 50f;
 
-    // public void BlockHit(int gridHitX, int gridHitY, BlockData blockData, int blockHitX, int blockHitY, int blockRotation = 0)
-    // {
-    //     // gridHit représente les coordonnées de la grille où le bloc a été touché
-
-    //     // blockHit représente les coordonnées de la cellule dans le bloc (qui a touché)
-    //     // Par exemple pour un bloc T:
-    //     //
-
-    //     // On peut ajouter ici la logique de ce qui se passe quand le bloc est touché
-    //     Debug.Log($"Block hit ground at ({gridHitX}, {gridHitY}) with block data: {blockData.blockName}");
-
-    //     // Placement de l'objet 3D
-
-    //     // Placement du centre du bloc
-    //     int pivotX = gridHitX - blockHitX;
-    //     int pivotY = gridHitY - blockHitY;
-
-    //     GameObject newBlockGO = DrawBlock(gridHitX, gridHitY, blockData.blockPrefab, blockRotation);
-
-
-    //     // Update des cellules dans la grille
-
-
-    //     for (int i = 0; i < blockData.shape.Length; i++)
-    //     {
-    //         bool cellIsSolid = blockData.shape[i];
-    //         if (!cellIsSolid) continue;
-
-    //         int localX = i % 3;     // Colonne (0 à 2)
-    //         int localY = i / 3;     // Ligne   (0 à 2)
-
-    //         int rotX = localX;
-    //         int rotY = localY;
-
-    //         // Appliquer la rotation
-    //         switch (blockRotation % 360)
-    //         {
-    //             case 90:
-    //                 rotX = 2 - localY;
-    //                 rotY = localX;
-    //                 break;
-    //             case 180:
-    //                 rotX = 2 - localX;
-    //                 rotY = 2 - localY;
-    //                 break;
-    //             case 270:
-    //                 rotX = localY;
-    //                 rotY = 2 - localX;
-    //                 break;
-    //                 // 0 ou valeur par défaut : aucune rotation
-    //         }
-
-    //         int gridX = pivotX + rotX;
-    //         int gridY = pivotY + rotY;
-
-    //         // Mise à jour de la grille de cellules:
-    //         LevelGrid.grid[gridX, gridY] = new Cell(newBlockGO, new Vector2Int(gridX, gridY), blockData.color);
-    //         Debug.Log($"→ Cellule placée en ({gridX}, {gridY})");
-    //     }
-    // }
 
     public GameObject DrawBlock(int x, int y, GameObject blockPrefab, int blockRotation = 0)
     {
@@ -152,7 +92,7 @@ public class LevelGridManager : MonoBehaviour
         //Debug.Log("gridHeight: " + gridHeight);
 
         // Create an actual instance of the block at this position
-        GameObject blockInstance = DrawBlock(x, y, block.blockPrefab);
+        GameObject blockInstance = DrawBlock(x, y, block.blockPrefab, block.rotation);
 
         for (int i = 0; i < 3; i++) // Pour chaque cellule de la matrice du bloc
         {
