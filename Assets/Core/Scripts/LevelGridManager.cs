@@ -7,7 +7,7 @@ public class LevelGridManager : MonoBehaviour
 
     [Header("Blocks Settings")]
 
-    public float blockHeightOffset = -1;
+    public float drawBlockHeightOffset = 1.5f;
 
     public GameObject floorPrefab;
     public float floorWidth = 50f;
@@ -100,7 +100,7 @@ public class LevelGridManager : MonoBehaviour
     {
         // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
+        worldPos += new Vector3(0f, drawBlockHeightOffset, 0f); // Offset
 
 
         // Applique une rotation selon Z (Unity fonctionne avec Z vers l'écran en 2D vue de dessus)
@@ -127,7 +127,7 @@ public class LevelGridManager : MonoBehaviour
         //Récupère le bloc à déplacer
         GameObject blockPrefab = LevelGrid.grid[currentPosX, currentPosY].blockGO;
         // Déplace le bloc sur sa nouvelle position
-        blockPrefab.transform.position = GridToWorld(newPosX, newPosY) + new Vector3(cellSize, cellSize + blockHeightOffset, 0) * 0.5f; // Center the block in the cell
+        blockPrefab.transform.position = GridToWorld(newPosX, newPosY) + new Vector3(cellSize, cellSize + drawBlockHeightOffset, 0) * 0.5f; // Center the block in the cell
 
 
         // Revérifie le parentage si on a déplacé le bloc sur le côté
