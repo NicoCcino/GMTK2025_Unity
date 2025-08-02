@@ -2136,6 +2136,10 @@ PrefabInstance:
       propertyPath: levelGridManager
       value: 
       objectReference: {fileID: 718335858}
+    - target: {fileID: 8145782836450245511, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
+      propertyPath: playerRunSpeed
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8788010655805317817, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.5
