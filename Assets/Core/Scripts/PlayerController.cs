@@ -269,13 +269,17 @@ public class PlayerController : MonoBehaviour
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
         blockSpeed = blockFallSpeed;
-        
+
         // Clean up any existing preview block when starting a new block
         if (currentPreviewBlock != null)
         {
             Destroy(currentPreviewBlock);
             currentPreviewBlock = null;
         }
+
+        // Trigger a cam shake effect when resetting the block height
+        CameraShake cameraShake = FindFirstObjectByType<CameraShake>();
+        cameraShake.StartShake();
     }
 
 
