@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Block_Simple_1 : Block
 {
-    public Block_Simple_1() : base("Simple Block", "Prefab_Block_Simple_1")
+    public Block_Simple_1() : base("Simple Block", "Prefab_Block_Simple_1","Sprite_Block_Simple_1")
     {
         // Pattern (3x3 matrix - visual representation):
         // [0,2] [1,2] [2,2]     O O O

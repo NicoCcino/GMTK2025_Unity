@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Block_T_5 : Block
 {
-    public Block_T_5() : base("Block_T_5", "Prefab_Block_T_5")
+    public Block_T_5() : base("Block_T_5", "Prefab_Block_T_5", "Sprite_Block_T_5") // Setup name, Prefab path, Preview Sprite path
     {
         // Pattern (3x3 matrix - visual representation):
         // [0,2] [1,2] [2,2]     X X X
@@ -26,15 +26,6 @@ public class Block_T_5 : Block
 
     public override void Trigger(Vector2Int position, GameObject player)
     {
-        base.Trigger(position, player);
-        Debug.Log("JumpPad activated!");
-        
-        // Jump pad logic - add force to player
-        PlayerJump playerJump = player.GetComponent<PlayerJump>();
-        if (playerJump != null)
-        {
-            // Trigger a jump effect
-            //playerJump.Jump();
-        }
+
     }
 }

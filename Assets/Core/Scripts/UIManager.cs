@@ -76,6 +76,36 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public Image previewBlockImage1;
+    public Image previewBlockImage2;
+    public Image previewBlockImage3;
+
+    public void UpdateBlocksQueuePreview(Block[] blocksQueue)
+    {
+        if (blocksQueue == null || blocksQueue.Length < 3)
+        {
+            Debug.LogWarning("blockQueue n'est pas initialisée ou trop petite.");
+            return;
+        }
+
+        // Tableau des images UI
+        Image[] previewImages = new Image[] { previewBlockImage1, previewBlockImage2, previewBlockImage3 };
+
+        for (int i = 0; i < 3; i++)
+        {
+            var block = blocksQueue[i];
+            if (block != null && block.previewSprite != null)
+            {
+                previewImages[i].sprite = block.previewSprite;
+                previewImages[i].color = Color.white;  // Assure que l'image est visible
+            }
+            else
+            {
+                previewImages[i].sprite = null;        // Pas de sprite => image vide
+                previewImages[i].color = new Color(1, 1, 1, 0); // Invisible (alpha 0)
+            }
+        }
+    }
     public void RestartGame()
     {
         // Logic to restart the game

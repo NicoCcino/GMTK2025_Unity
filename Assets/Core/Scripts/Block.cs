@@ -4,7 +4,9 @@ public class Block
 {
     public string blockName;
     private GameObject _blockPrefab;        // Prefab du bloc (private)
+    private Sprite _previewSprite;        // Prefab du preview sprite (private)
     private string _prefabPath;             // Path for lazy loading
+    private string _previewSpritePath;      // Path for lazy loading
     public GameObject gameObject;           // L'objet visuel instantié du bloc
     public Vector2Int gridPosition;         // Position du centre (pivot) sur la grille
     public Cell[,] blockMatrix = new Cell[3, 3]; // Matrice 3x3 du bloc
@@ -13,6 +15,8 @@ public class Block
     // Public property for lazy loading
     public GameObject blockPrefab
     {
+
+        // Get block prefab asset
         get
         {
             if (_blockPrefab == null && !string.IsNullOrEmpty(_prefabPath))
@@ -34,6 +38,29 @@ public class Block
             _blockPrefab = value;
         }
     }
+    public Sprite previewSprite
+    {
+
+        // Get block preview sprite asset
+
+        // Lazy-load du sprite preview
+        get
+        {
+            if (_previewSprite == null && !string.IsNullOrEmpty(_previewSpritePath))
+            {
+                _previewSprite = Resources.Load<Sprite>(_previewSpritePath);
+                if (_previewSprite == null)
+                    Debug.LogError($"Failed to load preview sprite at path: {_previewSpritePath}");
+                else
+                    Debug.Log($"Loaded preview sprite: {_previewSpritePath}");
+            }
+            return _previewSprite;
+        }
+        set
+        {
+            _previewSprite = value;
+        }
+    }
 
     public Block(string name, GameObject prefab)
     {
@@ -48,6 +75,15 @@ public class Block
         _prefabPath = prefabPath;
         InitializeMatrix();
     }
+
+        public Block(string name, string prefabPath, string previewSpritePath)
+    {
+        blockName = name;
+        _prefabPath = prefabPath;
+        _previewSpritePath = previewSpritePath;
+        InitializeMatrix();
+    }
+
 
     public Block(GameObject obj, Vector2Int pos, Color col)
     {

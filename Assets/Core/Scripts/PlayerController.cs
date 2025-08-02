@@ -346,7 +346,11 @@ public class PlayerController : MonoBehaviour
         Debug.Log(blockQueue[0].blockName);
         Debug.Log(blockQueue[1].blockName);
         Debug.Log(blockQueue[2].blockName);
+
+        uiManager.UpdateBlocksQueuePreview(blockQueue);
     }
+
+    public UIManager uiManager;
 
     public void AdvanceBlockQueue()
     {
@@ -362,6 +366,9 @@ public class PlayerController : MonoBehaviour
 
         // Met à jour le bloc courant
         currentBlock = blockQueue[0];
+
+        // Met à jour les previews
+        uiManager.UpdateBlocksQueuePreview(blockQueue);
     }
 
     public Block GetRandomBlock()
