@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     private int currentBlockHeight;
     private float blockSpeed;
     private GameObject currentPreviewBlock;
-    
+
     // Collision state variables shared between functions
     private bool isBlockedLeft;
     private bool isBlockedRight;
@@ -50,9 +50,9 @@ public class PlayerController : MonoBehaviour
 
         // Initialize available blocks
         InitializeBlocks();
-        
-        // Select a random block to start with
-        SelectRandomBlock();
+
+        // SInitialize Queue with 3 blocks
+        InitializeQueue();
 
         // Initialize last mouse grid position
         lastMouseGridPosition = new Vector2Int(0, currentBlockHeight);
@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
             // If there's a block on the right, prevent moving past it
             mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
         }
-        
+
         if (isBlockedLeft && mouseGridPos.x < lastMouseGridPosition.x)
         {
             // If there's a block on the left, prevent moving past it
@@ -182,21 +182,21 @@ public class PlayerController : MonoBehaviour
     void CollisionUpdate()
     {
         if (levelGridManager == null) return;
-        
+
         // Update collision state based on current position
         isBlockedLeft = CellBlockedLeftOf(lastMouseGridPosition.x, lastMouseGridPosition.y);
         isBlockedRight = CellBlockedRightOf(lastMouseGridPosition.x, lastMouseGridPosition.y);
-        
+
         // Check for ground collision (block hitting bottom or another block below)
         Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
         Vector2Int currentBlockPos = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
-        
+
         // Store positions for potential snapping
         snapMouseGridPos = lastMouseGridPosition;
         snapPlayerPivotGridPos = PlayerPivotGridPos;
-        
+
         // Check if block should snap to ground
-        if((PlayerPivotGridPos.y + currentBlockHeight <= 0) || 
+        if ((PlayerPivotGridPos.y + currentBlockHeight <= 0) ||
         (currentBlockPos.y - 1 >= 0 && LevelGrid.grid[currentBlockPos.x, currentBlockPos.y - 1] != null))
         {
             SnapBlock(snapMouseGridPos, snapPlayerPivotGridPos);
@@ -246,15 +246,6 @@ public class PlayerController : MonoBehaviour
         return lastMouseGridPosition;
     }
 
-    // Public method to set a block at a specific grid position
-    public void SetBlockAtGridPosition(int x, int y, Color color)
-    {
-        if (levelGridManager != null && currentBlock != null && currentBlock.blockPrefab != null)
-        {
-            // Use SetBlock instead of SetCell to place the entire block pattern
-            levelGridManager.SetBlock(x, y, currentBlock.blockPrefab, currentBlock);
-        }
-    }
 
     // Update block falling over time
     private void UpdateBlockFalling()
@@ -285,7 +276,10 @@ public class PlayerController : MonoBehaviour
         }
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
-        
+
+        // Advance in block queue = get next block + generate a new one last in the queue
+        AdvanceBlockQueue();
+
         // Clean up any existing preview block when starting a new block
         if (currentPreviewBlock != null)
         {
@@ -320,9 +314,11 @@ public class PlayerController : MonoBehaviour
 
 
     // GESTION DES DIFFERENTS TYPES DE BLOC / SELECTION / RANDOMISATION
-    
+
     public Block[] availableBlocks; // Liste des blocs disponibles
     public Block currentBlock; // Bloc actuellement sélectionné
+
+    public Block[] blockQueue = new Block[3];
 
     private void InitializeBlocks()
     {
@@ -332,7 +328,7 @@ public class PlayerController : MonoBehaviour
             new Block_T_5(),
             new Block_Simple_1()
         };
-        
+
         Debug.Log($"Initialized {availableBlocks.Length} blocks");
         foreach (Block block in availableBlocks)
         {
@@ -340,20 +336,53 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void SelectRandomBlock()
+    private void InitializeQueue()
+    {
+        blockQueue[0] = GetRandomBlock();
+        blockQueue[1] = GetRandomBlock();
+        blockQueue[2] = GetRandomBlock();
+        currentBlock = blockQueue[0];
+        Debug.Log("Blocks Queue Initialized with");
+        Debug.Log(blockQueue[0].blockName);
+        Debug.Log(blockQueue[1].blockName);
+        Debug.Log(blockQueue[2].blockName);
+    }
+
+    public void AdvanceBlockQueue()
+    {
+        Debug.Log("Advancing in Block Queue");
+        // Décale tous les blocs vers la gauche
+        for (int i = 0; i < blockQueue.Length - 1; i++)
+        {
+            blockQueue[i] = blockQueue[i + 1];
+        }
+
+        // Ajoute un nouveau bloc aléatoire à la fin
+        blockQueue[blockQueue.Length - 1] = GetRandomBlock();
+
+        // Met à jour le bloc courant
+        currentBlock = blockQueue[0];
+    }
+
+    public Block GetRandomBlock()
     {
         // Select a random block from the array
         if (availableBlocks != null && availableBlocks.Length > 0)
         {
             int randomIndex = Random.Range(0, availableBlocks.Length);
-            currentBlock = availableBlocks[randomIndex];
-            
-            Debug.Log("Selected Block: " + currentBlock.blockName);
+            Block newBlock = availableBlocks[randomIndex];
+            Debug.Log("Random block generated: " + newBlock.blockName);
+            return newBlock;
         }
         else
         {
             Debug.LogWarning("No block available to select.");
+            // Crée un bloc vide simple
+            Block fallback = new Block_Simple_1();
+            fallback.blockName = "FallbackBlock";
+            return fallback;
         }
     }
 
-} 
+
+}
