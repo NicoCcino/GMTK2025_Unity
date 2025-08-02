@@ -146,43 +146,27 @@ public class LevelGridManager : MonoBehaviour
 
     public void SetBlock(int x, int y, GameObject blockPrefab, Block block)
     {
-        // Le pivot du bloc est au centre de la matrice 3x3
-        // On va donc placer les cellules du bloc autour de ce pivot
-
-        int offsetX = 1;
-        int offsetY = 1;
-
         int gridWidth = LevelGrid.grid.GetLength(0);
+        //Debug.Log("gridWidth: " + gridWidth);
         int gridHeight = LevelGrid.grid.GetLength(1);
+        //Debug.Log("gridHeight: " + gridHeight);
 
-        for (int i = 0; i < 3; i++)
+         // Create an actual instance of the block at this position
+        GameObject blockInstance = DrawBlock(x, y, block.blockPrefab);
+
+        for (int i = 0; i < 3; i++) // Pour chaque cellule de la matrice du bloc
         {
             for (int j = 0; j < 3; j++)
             {
-                int worldX = x + (i - offsetX);
-                int worldY = y + (j - offsetY);
-
-                // Appliquer wrap-around (torique)
-                worldX = (worldX + gridWidth) % gridWidth;
-                worldY = (worldY + gridHeight) % gridHeight;
-
-                if (!LevelGrid.InBounds(worldX, worldY)) continue;
-
-                Cell blockCell = block.blockMatrix[i, j];
-
-                // Only place cells that are marked as solid in the block matrix
-                if (block.blockMatrix[i, j].isSolid)
+                int cellWorldPosX = x + i - 1;
+                int cellWorldPosY = y + j ; 
+                Debug.Log($"Setting cell at ({i}, {j}) in matrix of {block.blockName} at position ({cellWorldPosX}, {cellWorldPosY})");
+                Cell cell = block.blockMatrix[i, j];
+                if (cell != null && cell.isSolid) // Si la cellule est solide
                 {
-                    // Create an actual instance of the block at this position
-                    GameObject blockInstance = DrawBlock(worldX, worldY, block.blockPrefab);
-                    
-                    // Create cell with the instantiated GameObject
-                    Cell cellInstance = new Cell(
-                        blockInstance,  // Use the instantiated GameObject
-                        block,
-                        new Vector2Int(i, j)
-                    );
-                    SetCell(worldX, worldY, blockInstance, cellInstance.block, cellInstance.positionInBlockMatrix);
+                    // On place la cellule dans la grille en définissant les coordonnées à partir du centre x,y
+                    SetCell(cellWorldPosX, cellWorldPosY, blockInstance, block, new Vector2Int(i, j));
+                    Debug.Log($"Cell at ({cellWorldPosX}, {cellWorldPosY}) set with cell {cell} which is isSolid: {cell.isSolid}");
                 }
             }
         }
@@ -206,8 +190,12 @@ public class LevelGridManager : MonoBehaviour
         // Gestion des cellules dans grille
         Cell newCell = new Cell(blockPrefab, block, posInBlockMatrix);
 
+        // Set cell as solid if block says so
+        newCell.isSolid = block.blockMatrix[posInBlockMatrix.x, posInBlockMatrix.y].isSolid;
+
         // Enregistrement du bloc dans la grille
         LevelGrid.grid[x, y] = newCell;
+        Debug.Log($"Cell set at ({x}, {y}) with block {block.blockName} with solid state =  at position in block matrix {posInBlockMatrix}");
     }
 
     public bool IsCellSolid(int x, int y) // is there a solid cell at this position?
@@ -334,7 +322,7 @@ public class LevelGridManager : MonoBehaviour
     {
         Vector3 pos = player.transform.position;
         playerGridPosition = WorldToGrid(pos);
-        Debug.Log($"Player Grid Position: {playerGridPosition}");
+        // Debug.Log($"Player Grid Position: {playerGridPosition}");
         return playerGridPosition;
     }
 
@@ -370,14 +358,14 @@ public class LevelGridManager : MonoBehaviour
     void PlayerEntersNewColumn(int newCol)
     {
         // Logique pour gérer l'entrée du joueur dans une nouvelle colonne
-        Debug.Log("Player entered a new column at: " + playerGridPosition);
+        //Debug.Log("Player entered a new column at: " + playerGridPosition);
         // Ici, vous pouvez ajouter des actions spécifiques à effectuer lorsque le joueur entre dans une nouvelle colonne
 
 
         currentPlayerColumn = newCol;
         int blocksInColumn = CountValueInColumn(newCol);
         moneyManager.AddMoney(blocksInColumn);
-        Debug.Log($"Nouvelle colonne {newCol} : +{blocksInColumn} argent. Total: {moneyManager.money}");
+        //Debug.Log($"Nouvelle colonne {newCol} : +{blocksInColumn} argent. Total: {moneyManager.money}");
     }
 
     void EmptyGrid()

@@ -13,7 +13,7 @@ public class Cell
         this.blockGO = blockGO;           // Assignation correcte du GameObject
         this.value = 1;                   // Valeur par défaut, modifiable après
         this.positionInBlockMatrix = posInBlockMatrix; // Position dans la matrice du bloc
-        this.isSolid = false;             // Default value, will be set later to avoid circular dependency
         this.block = block;               // Référence au bloc
     }
+    
 }

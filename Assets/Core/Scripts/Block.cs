@@ -73,10 +73,4 @@ public class Block
     {
         Debug.Log($"Block {blockName} triggered at {position}");
     }
-
-    // Méthode pour placer le bloc sur la grille
-    public virtual void PlaceOnGrid(Vector2Int position)
-    {
-        gridPosition = position;
-    }
 }
