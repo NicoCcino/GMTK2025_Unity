@@ -99,29 +99,18 @@ public class PlayerController : MonoBehaviour
         }
         // Convert world position to grid position using LevelGridManager's WorldToGrid function
         Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
-        
+
         // Check for block collision on the right side (with grid wrapping)
-        int x = lastMouseGridPosition.x + 1;
-        if (x > LevelGrid.gridWidth - 1)
-        {
-            x = 0; // Wrap to the left side of the grid
-        }
-        if (LevelGrid.grid[x, lastMouseGridPosition.y] != null)
-        {
+        if (CellBlockedRightOf(lastMouseGridPosition.x, lastMouseGridPosition.y)){
             // If there's a block on the right, prevent moving past it
             if (mouseGridPos.x > lastMouseGridPosition.x)
             {
                 mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
             }
         }
-        
+
         // Check for block collision on the left side (with grid wrapping)
-        x = lastMouseGridPosition.x - 1;
-        if (x < 0)
-        {
-            x = LevelGrid.gridWidth - 1; // Wrap to the right side of the grid
-        }
-        if (LevelGrid.grid[x, lastMouseGridPosition.y] != null)
+        if (CellBlockedLeftOf(lastMouseGridPosition.x, lastMouseGridPosition.y))
         {
             // If there's a block on the left, prevent moving past it
             if (mouseGridPos.x < lastMouseGridPosition.x)
@@ -129,6 +118,8 @@ public class PlayerController : MonoBehaviour
                 mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
             }
         }
+
+
         Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
         mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
         if (mouseGridPos.x <0)
@@ -181,6 +172,42 @@ public class PlayerController : MonoBehaviour
         if (mouse.leftButton.wasReleasedThisFrame)
         {
             blockSpeed = blockFallSpeed;
+        }
+    }
+
+    public bool CellBlockedRightOf(int x, int y)
+    {
+        // Check for cell collision on the right side (with grid wrapping)
+        int xChecked = x + 1;
+        if (xChecked > LevelGrid.gridWidth - 1)
+        {
+            xChecked = 0; // Wrap to the left side of the grid
+        }
+        if (LevelGrid.grid[xChecked, y] != null)
+        {
+            return true; // There's a block on the right
+        }
+        else
+        {
+            return false; // No block on the right
+        }
+    }
+    public bool CellBlockedLeftOf(int x, int y)
+    {
+        // Check for block collision on the left side (with grid wrapping)
+        int xChecked = lastMouseGridPosition.x - 1;
+        if (xChecked < 0)
+        {
+            xChecked = LevelGrid.gridWidth - 1; // Wrap to the right side of the grid
+        }
+        if (LevelGrid.grid[xChecked, y] != null)
+        {
+
+            return true; // There's a block on the left
+        }
+        else
+        {
+            return false;
         }
     }
     
