@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private float fallTimer;
     private int currentBlockHeight;
     private float blockSpeed;
+    private GameObject currentPreviewBlock;
 
     void Start()
     {
@@ -140,15 +141,15 @@ public class PlayerController : MonoBehaviour
         // Only update if the grid position has changed
         if (mouseGridPos != lastMouseGridPosition)
         {
-            // Clear the previous cell if it exists
-            if (lastMouseGridPosition != Vector2Int.zero)
+            // Destroy the previous preview block if it exists
+            if (currentPreviewBlock != null)
             {
-                levelGridManager.ClearCell(lastMouseGridPosition.x, lastMouseGridPosition.y);
+                Destroy(currentPreviewBlock);
+                currentPreviewBlock = null;
             }
 
-            // Create a new block at the new mouse position using DrawBlock and SetCell
-            GameObject newBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlockData.blockPrefab);
-            levelGridManager.SetCell(mouseGridPos.x, mouseGridPos.y, newBlock, false, cellColor);
+            // Create a new preview block at the new mouse position (visual only, no grid registration)
+            currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlockData.blockPrefab);
 
             // Update last position
             lastMouseGridPosition = mouseGridPos;
@@ -156,18 +157,31 @@ public class PlayerController : MonoBehaviour
             if (PlayerPivotGridPos.y + currentBlockHeight <= 0)
             {
                 // we reached the bottom of the grid, keep the bloc in position and reset the block height
+                GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
+                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, permanentBlock, true, cellColor);
                 ResetBlockHeight();
-                newBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
-                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, newBlock, true, cellColor);
+                // Destroy preview block and create permanent block
+                if (currentPreviewBlock != null)
+                {
+                    Destroy(currentPreviewBlock);
+                    currentPreviewBlock = null;
+                }
                 lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
             }
             // if cell under mouseGridPos is set
             if (mouseGridPos.y - 1 >= 0 && LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null)
             {
                 // The cell under mouseGridPos is set
+                GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
+                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, permanentBlock, true, cellColor);
                 ResetBlockHeight();
-                newBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
-                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, newBlock, true, cellColor);
+                
+                // Destroy preview block and create permanent block
+                if (currentPreviewBlock != null)
+                {
+                    Destroy(currentPreviewBlock);
+                    currentPreviewBlock = null;
+                }
                 lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
             }
         }
@@ -255,6 +269,13 @@ public class PlayerController : MonoBehaviour
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
         blockSpeed = blockFallSpeed;
+        
+        // Clean up any existing preview block when starting a new block
+        if (currentPreviewBlock != null)
+        {
+            Destroy(currentPreviewBlock);
+            currentPreviewBlock = null;
+        }
     }
 
 
