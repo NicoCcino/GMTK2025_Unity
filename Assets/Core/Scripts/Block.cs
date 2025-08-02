@@ -11,6 +11,7 @@ public class Block
     public Vector2Int gridPosition;         // Position du centre (pivot) sur la grille
     public Cell[,] blockMatrix = new Cell[3, 3]; // Matrice 3x3 du bloc
     public Color color = Color.white;       // Couleur du bloc
+    public int rotation = 0;
 
     // Public property for lazy loading
     public GameObject blockPrefab

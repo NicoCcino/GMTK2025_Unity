@@ -171,7 +171,7 @@ public class PlayerController : MonoBehaviour
             // Create a new preview block at the new mouse position (visual only, no grid registration)
             if (currentBlock != null && currentBlock.blockPrefab != null)
             {
-                currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlock.blockPrefab);
+                currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlock.blockPrefab, currentBlock.rotation);
             }
             else if (currentBlock != null)
             {
@@ -191,6 +191,10 @@ public class PlayerController : MonoBehaviour
         if (mouse.leftButton.wasReleasedThisFrame)
         {
             blockSpeed = blockFallSpeed;
+        }
+        if (mouse.rightButton.wasPressedThisFrame)
+        {
+            RotateBlock();
         }
     }
 
@@ -351,7 +355,6 @@ public class PlayerController : MonoBehaviour
         return lastMouseGridPosition;
     }
 
-
     // Update block falling over time
     private void UpdateBlockFalling()
     {
@@ -365,6 +368,62 @@ public class PlayerController : MonoBehaviour
             
             // Immediately update position when height changes to prevent desync
             UpdateBlockPosition();
+        }
+    }
+
+    private void RotateBlock()
+    {
+        if (currentBlock != null && currentBlock.blockMatrix != null)
+        {
+            // Create a new 3x3 matrix for the rotated result
+            Cell[,] rotatedMatrix = new Cell[3, 3];
+            
+            // Perform 90-degree counterclockwise rotation
+            // For each position in the new matrix
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    // Get the source cell from the original matrix
+                    // 90° counterclockwise: new[i,j] = old[2-j, i]
+                    Cell sourceCell = currentBlock.blockMatrix[2 - j, i];
+                    
+                    if (sourceCell != null)
+                    {
+                        // Create a new cell with the rotated position
+                        rotatedMatrix[i, j] = new Cell(sourceCell.blockGO, sourceCell.block, new Vector2Int(i, j));
+                        // Copy the solid state
+                        rotatedMatrix[i, j].isSolid = sourceCell.isSolid;
+                    }
+                    else
+                    {
+                        // Create an empty cell at the new position
+                        rotatedMatrix[i, j] = new Cell(null, currentBlock, new Vector2Int(i, j));
+                        rotatedMatrix[i, j].isSolid = false;
+                    }
+                }
+            }
+            
+            // Replace the original matrix with the rotated one
+            currentBlock.blockMatrix = rotatedMatrix;
+            
+            // Update rotation tracking: increment by 90° and wrap around at 360°
+            currentBlock.rotation = (currentBlock.rotation + 90) % 360;
+            
+            // Update the preview block to show the new rotation immediately
+            if (currentPreviewBlock != null)
+            {
+                Destroy(currentPreviewBlock);
+                currentPreviewBlock = null;
+            }
+            
+            // Create new preview with rotated block
+            if (currentBlock.blockPrefab != null)
+            {
+                currentPreviewBlock = levelGridManager.DrawBlock(lastMouseGridPosition.x, lastMouseGridPosition.y, currentBlock.blockPrefab, currentBlock.rotation);
+            }
+            
+            Debug.Log($"Block {currentBlock.blockName} rotated 90° counterclockwise - Current rotation: {currentBlock.rotation}°");
         }
     }
 
@@ -463,6 +522,12 @@ public class PlayerController : MonoBehaviour
         blockQueue[1] = GetRandomBlock();
         blockQueue[2] = GetRandomBlock();
         currentBlock = blockQueue[0];
+        
+        // Ensure first block starts with 0 rotation
+        if (currentBlock != null)
+        {
+            currentBlock.rotation = 0;
+        }
         Debug.Log("Blocks Queue Initialized with");
         Debug.Log(blockQueue[0].blockName);
         Debug.Log(blockQueue[1].blockName);
@@ -505,6 +570,12 @@ public class PlayerController : MonoBehaviour
 
         // Met à jour le bloc courant
         currentBlock = blockQueue[0];
+        
+        // Ensure current block starts with 0 rotation (should already be 0, but double-check)
+        if (currentBlock != null)
+        {
+            currentBlock.rotation = 0;
+        }
 
         // Met à jour les previews
         if (IsUIManagerReady())
@@ -523,8 +594,13 @@ public class PlayerController : MonoBehaviour
         if (availableBlocks != null && availableBlocks.Length > 0)
         {
             int randomIndex = Random.Range(0, availableBlocks.Length);
-            Block newBlock = availableBlocks[randomIndex];
-            Debug.Log("Random block generated: " + newBlock.blockName);
+            Block template = availableBlocks[randomIndex];
+            
+            // Create a fresh copy of the selected block to avoid shared rotation state
+            Block newBlock = CreateBlockCopy(template);
+            newBlock.rotation = 0; // Ensure new blocks start with 0 rotation
+            
+            Debug.Log("Random block generated: " + newBlock.blockName + " (rotation: " + newBlock.rotation + "°)");
             return newBlock;
         }
         else
@@ -533,8 +609,37 @@ public class PlayerController : MonoBehaviour
             // Crée un bloc vide simple
             Block fallback = new Block_Simple_1();
             fallback.blockName = "FallbackBlock";
+            fallback.rotation = 0; // Ensure fallback starts with 0 rotation
             return fallback;
         }
+    }
+
+    // Create a copy of a block to avoid shared state issues
+    private Block CreateBlockCopy(Block template)
+    {
+        Block copy;
+        
+        // Create new instance based on block type
+        if (template is Block_T_5)
+        {
+            copy = new Block_T_5();
+        }
+        else if (template is Block_Simple_1)
+        {
+            copy = new Block_Simple_1();
+        }
+        else if (template is Block_JumpPad_1)
+        {
+            copy = new Block_JumpPad_1();
+        }
+        else
+        {
+            // Generic fallback - create simple block
+            copy = new Block_Simple_1();
+            copy.blockName = template.blockName + "_Copy";
+        }
+        
+        return copy;
     }
 
 
