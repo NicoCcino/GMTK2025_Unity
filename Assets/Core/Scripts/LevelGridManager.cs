@@ -140,6 +140,25 @@ public class LevelGridManager : MonoBehaviour
         return newBlockGO; // Donne l'instance du bloc 3D crée en sortie
     }
 
+    public void MoveDrawBlock(int directionX, int directionY, GameObject blockPrefab)
+    {
+        // Déplace le bloc dans la direction spécifiée
+        blockPrefab.transform.Translate(new Vector3(directionX, directionY, 0));
+
+        // Revérifie le parentage si on a déplacé le bloc sur le côté
+        if (directionX != 0)
+        {
+            foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
+            {
+                if (blockPrefab.transform.position.x >= floor.transform.position.x && blockPrefab.transform.position.x < floor.transform.position.x + floorWidth)
+                { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
+                    blockPrefab.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
+                    break;
+                }
+            }
+        }
+    }
+
     public void SetCell(int x, int y, Color color)
     {
         // Check if the coordinates are within bounds
