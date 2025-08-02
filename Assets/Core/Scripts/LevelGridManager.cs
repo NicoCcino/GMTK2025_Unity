@@ -315,9 +315,27 @@ public class LevelGridManager : MonoBehaviour
         Debug.Log($"Nouvelle colonne {newCol} : +{blocksInColumn} argent. Total: {moneyManager.money}");
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void EmptyGrid()
     {
+        // Vide la grille de tous les blocs 
+        for (int x = 0; x < LevelGrid.gridWidth; x++)
+        {
+            for (int y = 0; y < LevelGrid.gridHeight; y++)
+            {
+                if (LevelGrid.grid[x, y] != null)
+                {
+                    Destroy(LevelGrid.grid[x, y].gameObject);
+                    LevelGrid.grid[x, y] = null; // On vide la cellule de la grille
+                }
+            }
+        }
+        Debug.Log("Grid emptied.");
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+        void Start()
+    {
+        EmptyGrid();
         player = GameObject.Find("PlayerPivot");
         moneyManager = GameObject.Find("MoneyManager").GetComponent<MoneyManager>();
         //SetCell(10, 0, Color.red);

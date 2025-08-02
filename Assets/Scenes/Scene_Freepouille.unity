@@ -1170,10 +1170,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff6b8b9cbae9a64a9c463d01f6b15cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  availableBlocks:
-  - {fileID: 11400000, guid: 7c297460eee4d0c47aaa09225d0b15fb, type: 2}
-  - {fileID: 11400000, guid: ef21e05a01e878440bdb10276c85947c, type: 2}
-  currentBlockData: {fileID: 0}
   blockHeightOffset: -1
   floorPrefab: {fileID: 0}
   floorWidth: 50
@@ -1439,13 +1435,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1619843400}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 1619843405}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1866,11 +1862,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f11a9a52a4e9c45adb3388795e520c44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelGridManager: {fileID: 0}
+  levelGridManager: {fileID: 718335858}
   cellColor: {r: 0, g: 0, b: 1, a: 1}
   initialBlocHeight: 5
   blockFallSpeed: 1
   blockClickFallSpeed: 0.01
+  availableBlocks:
+  - {fileID: 11400000, guid: 7c297460eee4d0c47aaa09225d0b15fb, type: 2}
+  currentBlockData: {fileID: 0}
 --- !u!4 &1056008645
 Transform:
   m_ObjectHideFlags: 0
@@ -2697,9 +2696,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1619843400}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41e447347c4bbf146a3ac8fa92cbcf79, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b7ae68a9708d324eac6df0f7723a3fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 807385638}
+  moneyManager: {fileID: 2049016848}
+  gameOverScreen: {fileID: 348723319}
+  textScoreSentence: {fileID: 759982260}
 --- !u!1 &1669067042
 GameObject:
   m_ObjectHideFlags: 0
@@ -3004,6 +3007,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   money: 0
+  score: 0
   moneyText: {fileID: 1669067044}
 --- !u!4 &2049016849
 Transform:
@@ -3042,7 +3046,7 @@ PrefabInstance:
       objectReference: {fileID: 718335858}
     - target: {fileID: 8145782836450245511, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
       propertyPath: playerRunSpeed
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8788010655805317817, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
       propertyPath: m_LocalPosition.x

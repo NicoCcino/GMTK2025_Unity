@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEditor.SearchService;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -20,14 +22,17 @@ public class UIManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (gameOverScreen = null)
+        if (gameOverScreen == null)
         {
             Debug.LogError("Game Over Screen is not assigned in the UIManager.");
 
             Debug.LogError("Trying to find Game Over screen in the scene, by name Panel_GameOver");
             gameOverScreen = GameObject.Find("Panel_GameOver");
         }
-        if (textScoreSentence = null)
+
+        HideGameOverScreen();
+
+        if (textScoreSentence == null)
         {
             Debug.LogError("Text Score Sentence is not assigned in the UIManager.");
 
@@ -55,10 +60,10 @@ public class UIManager : MonoBehaviour
         if (gameOverScreen != null)
         {
             gameOverScreen.SetActive(true);
-            string textScoreString = $"You have walked over {moneyManager.score} blocks: ";
+            string textScoreString = $"You have walked over {moneyManager.score} blocks.";
             textScoreSentence.text = textScoreString;
         }
-    }   
+    }
 
     public void HideGameOverScreen()
     {
@@ -69,5 +74,14 @@ public class UIManager : MonoBehaviour
         {
             gameOverScreen.SetActive(false);
         }
-    }   
+    }
+
+    public void RestartGame()
+    {
+        // Logic to restart the game
+        Debug.Log("Restarting Game.");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Script_Move_World.isPlayerDead = false; // Reset player state
+        moneyManager.money = 0;
+    }
 }
