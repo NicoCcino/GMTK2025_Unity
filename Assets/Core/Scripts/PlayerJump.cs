@@ -78,7 +78,7 @@ public class PlayerJump : MonoBehaviour
         }
 
         // Check death
-        if ((LevelGrid.grid[playerGridPosition.x, playerGridPosition.y] != null) || (LevelGrid.grid[playerGridPosition.x, playerGridPosition.y+1] != null))
+        if ((LevelGrid.grid[playerGridPosition.x, playerGridPosition.y+1] != null))
         {
             Debug.Log("Player is dead");
             // Stop player movement
