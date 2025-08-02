@@ -153,12 +153,19 @@ public class LevelGridManager : MonoBehaviour
         int offsetX = 1;
         int offsetY = 1;
 
+        int gridWidth = LevelGrid.grid.GetLength(0);
+        int gridHeight = LevelGrid.grid.GetLength(1);
+
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
             {
-                int worldX = x + (i - offsetX); // Position globale centrée
-                int worldY = y + (j - offsetY); // Position globale centrée
+                int worldX = x + (i - offsetX);
+                int worldY = y + (j - offsetY);
+
+                // Appliquer wrap-around (torique)
+                worldX = (worldX + gridWidth) % gridWidth;
+                worldY = (worldY + gridHeight) % gridHeight;
 
                 if (!LevelGrid.InBounds(worldX, worldY)) continue;
 
@@ -170,7 +177,7 @@ public class LevelGridManager : MonoBehaviour
                     blockData,
                     new Vector2Int(i, j)
                 );
-                SetCell(worldX,worldY, cellInstance.blockGO, cellInstance.blockData, cellInstance.positionInBlockDataMatrix);
+                SetCell(worldX, worldY, cellInstance.blockGO, cellInstance.blockData, cellInstance.positionInBlockDataMatrix);
             }
         }
 
