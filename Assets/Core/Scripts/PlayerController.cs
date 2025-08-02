@@ -26,6 +26,13 @@ public class PlayerController : MonoBehaviour
     private int currentBlockHeight;
     private float blockSpeed;
     private GameObject currentPreviewBlock;
+    
+    // Collision state variables shared between functions
+    private bool isBlockedLeft;
+    private bool isBlockedRight;
+    private bool shouldSnapBlock;
+    private Vector2Int snapMouseGridPos;
+    private Vector2Int snapPlayerPivotGridPos;
 
     void Start()
     {
@@ -57,6 +64,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        CollisionUpdate();
         HandleMouseInput();
         UpdateBlockFalling();
     }
@@ -107,24 +115,17 @@ public class PlayerController : MonoBehaviour
         // Convert world position to grid position using LevelGridManager's WorldToGrid function
         Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
 
-        // Check for block collision on the right side (with grid wrapping)
-        if (CellBlockedRightOf(lastMouseGridPosition.x, lastMouseGridPosition.y))
+        // Apply collision constraints based on shared collision state
+        if (isBlockedRight && mouseGridPos.x > lastMouseGridPosition.x)
         {
             // If there's a block on the right, prevent moving past it
-            if (mouseGridPos.x > lastMouseGridPosition.x)
-            {
-                mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
-            }
+            mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
         }
-
-        // Check for block collision on the left side (with grid wrapping)
-        if (CellBlockedLeftOf(lastMouseGridPosition.x, lastMouseGridPosition.y))
+        
+        if (isBlockedLeft && mouseGridPos.x < lastMouseGridPosition.x)
         {
             // If there's a block on the left, prevent moving past it
-            if (mouseGridPos.x < lastMouseGridPosition.x)
-            {
-                mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
-            }
+            mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
         }
 
 
@@ -154,11 +155,6 @@ public class PlayerController : MonoBehaviour
 
             // Update last position
             lastMouseGridPosition = mouseGridPos;
-            // We have to compute if we keep this new bloc position or not
-            if ((PlayerPivotGridPos.y + currentBlockHeight <= 0) || (mouseGridPos.y - 1 >= 0 && LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null))
-            {
-                SnapBlock(mouseGridPos, PlayerPivotGridPos);
-            }
         }
 
         // Handle left mouse click and release
@@ -170,6 +166,31 @@ public class PlayerController : MonoBehaviour
         if (mouse.leftButton.wasReleasedThisFrame)
         {
             blockSpeed = blockFallSpeed;
+        }
+    }
+
+    void CollisionUpdate()
+    {
+        if (levelGridManager == null) return;
+        
+        // Update collision state based on current position
+        isBlockedLeft = CellBlockedLeftOf(lastMouseGridPosition.x, lastMouseGridPosition.y);
+        isBlockedRight = CellBlockedRightOf(lastMouseGridPosition.x, lastMouseGridPosition.y);
+        
+        // Check for ground collision (block hitting bottom or another block below)
+        Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+        Vector2Int currentBlockPos = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
+        
+        // Store positions for potential snapping
+        snapMouseGridPos = lastMouseGridPosition;
+        snapPlayerPivotGridPos = PlayerPivotGridPos;
+        
+        // Check if block should snap to ground
+        if((PlayerPivotGridPos.y + currentBlockHeight <= 0) || 
+        (currentBlockPos.y - 1 >= 0 && LevelGrid.grid[currentBlockPos.x, currentBlockPos.y - 1] != null))
+        {
+            SnapBlock(snapMouseGridPos, snapPlayerPivotGridPos);
+            return;
         }
     }
 
@@ -285,7 +306,7 @@ public class PlayerController : MonoBehaviour
     public BlockData[] availableBlocks; // Liste des blocs disponibles
     public BlockData currentBlockData; // Bloc actuellement sélectionné
 
-        public void SelectRandomBlock()
+    public void SelectRandomBlock()
     {
         // Select a random block prefab from the array
         if (availableBlocks.Length > 0)
