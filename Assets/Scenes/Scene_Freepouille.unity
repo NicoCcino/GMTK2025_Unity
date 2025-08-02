@@ -1278,7 +1278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ff6b8b9cbae9a64a9c463d01f6b15cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawBlockHeightOffset: 1.5
+  drawBlockHeightOffset: 0.5
   floorPrefab: {fileID: 0}
   floorWidth: 50
   player: {fileID: 2021525336}

@@ -7,7 +7,7 @@ public class LevelGridManager : MonoBehaviour
 
     [Header("Blocks Settings")]
 
-    public float drawBlockHeightOffset = 1.5f;
+    public float drawBlockHeightOffset = 0.5f;
 
     public GameObject floorPrefab;
     public float floorWidth = 50f;
@@ -100,7 +100,7 @@ public class LevelGridManager : MonoBehaviour
     {
         // Placement du bloc en 3D dans le monde
         Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(0f, drawBlockHeightOffset, 0f); // Offset
+        worldPos += new Vector3(0.5f, drawBlockHeightOffset,0f); // Offset
 
 
         // Applique une rotation selon Z (Unity fonctionne avec Z vers l'écran en 2D vue de dessus)
@@ -159,7 +159,7 @@ public class LevelGridManager : MonoBehaviour
             for (int j = 0; j < 3; j++)
             {
                 int worldGridPosX = x + i - 1;
-                int worldGridPosY = y + j;
+                int worldGridPosY = y + j -1;
                 Debug.Log($"Trying to set cell at ({i}, {j}) in matrix of {block.blockName} at position ({worldGridPosX}, {worldGridPosY})");
 
                 // Vérifie si les coordonnées sont dans les limites de la grille
