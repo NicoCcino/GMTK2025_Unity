@@ -3,6 +3,7 @@ using UnityEngine;
 public class Script_Move_World : MonoBehaviour
 {
     public static bool isPlayerDead = false;
+    public float playerRunSpeed = 5f;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,8 +18,7 @@ public class Script_Move_World : MonoBehaviour
         if (!isPlayerDead)
         {
             // Move the object left at a constant speed
-            float speed = 5f; // units per second
-            transform.Translate(Vector3.right * speed * Time.deltaTime);
+            transform.Translate(Vector3.right * playerRunSpeed * Time.deltaTime);
         }
     }
 }
