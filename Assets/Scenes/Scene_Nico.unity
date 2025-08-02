@@ -753,13 +753,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelGridManager: {fileID: 223666341}
-  cameraShake: {fileID: 0}
   cellColor: {r: 0, g: 0, b: 1, a: 1}
   initialBlocHeight: 5
   blockFallSpeed: 1
   blockClickFallSpeed: 0.01
-  availableBlocks:
-  - {fileID: 11400000, guid: 7c297460eee4d0c47aaa09225d0b15fb, type: 2}
+  availableBlockPrefabs: []
   currentBlockData: {fileID: 0}
 --- !u!4 &583190163
 Transform:
@@ -1064,6 +1062,73 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 95001aadb71e7c64bbebb373905d98bf, type: 3}
+--- !u!1 &915110924 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 718009959715334273, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
+  m_PrefabInstance: {fileID: 965814375}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &915110929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 915110924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9f972e2bf07cbf4fb7cb3ccd38a1f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isShaking: 0
+  shakeDuration: 0.5
+  shakeMagnitude: 0.5
+--- !u!1 &950023017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 950023019}
+  - component: {fileID: 950023018}
+  m_Layer: 0
+  m_Name: BlockDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &950023018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950023017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea81fe2b518b040349b630adcec3ec06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  availableBlocks:
+  - {fileID: 11400000, guid: 7c297460eee4d0c47aaa09225d0b15fb, type: 2}
+  currentBlockData: {fileID: 0}
+--- !u!4 &950023019
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950023017}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.19001, y: 1.5338, z: -0.34026}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &965814375
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1135,6 +1200,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3789501347079389070, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1779214734}
+    - targetCorrespondingSourceObject: {fileID: 718009959715334273, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 915110929}
   m_SourcePrefab: {fileID: 100100000, guid: a8d79ac6359333d4099ec7f6c499af4f, type: 3}
 --- !u!1 &984631475
 GameObject:
@@ -3490,3 +3558,4 @@ SceneRoots:
   - {fileID: 1958055162}
   - {fileID: 898992400}
   - {fileID: 304261250}
+  - {fileID: 950023019}

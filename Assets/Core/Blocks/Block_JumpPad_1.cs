@@ -1,38 +1,27 @@
 using UnityEngine;
 
-public class Block_JumpPad_1 : BlockData
+public class Block_JumpPad_1 : Block
 {
-    public Block_JumpPad_1()
+    public Block_JumpPad_1() : base("JumpPad", "Prefab_Block_T_5")
     {
-        blockName = "JumpPad";
-
-        // Assignation du prefab
-        blockPrefab = Resources.Load<GameObject>("Prefab_Block_T_5");
-
-        // blockMatrix = new Cell[3, 3];
-        
-        InitializeMatrix();
-
-
-    }
-
-    protected override void InitializeMatrix()
-    {
-        for (int x = 0; x < 3; x++)
+        // Set specific properties after base initialization
+        if (blockMatrix != null)
         {
-            for (int y = 0; y < 3; y++)
-            {
-                blockMatrix[x, y] = new Cell(blockPrefab, this, new Vector2Int(x, y));
-            }
-
+            blockMatrix[1, 0].isSolid = true;  // Exemple spécifique - center bottom cell is solid
         }
-        blockMatrix[1, 0].isSolid = true;  // Exemple spécifique
     }
 
     public override void Trigger(Vector2Int position, GameObject player)
     {
         base.Trigger(position, player);
         Debug.Log("JumpPad activated!");
-        // Logique du jump pad (ex: ajouter force au joueur)
+        
+        // Jump pad logic - add force to player
+        PlayerJump playerJump = player.GetComponent<PlayerJump>();
+        if (playerJump != null)
+        {
+            // Trigger a jump effect
+            //playerJump.Jump();
+        }
     }
 }

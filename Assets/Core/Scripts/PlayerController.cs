@@ -48,6 +48,9 @@ public class PlayerController : MonoBehaviour
             levelGridManager = FindFirstObjectByType<LevelGridManager>();
         }
 
+        // Initialize available blocks
+        InitializeBlocks();
+        
         // Select a random block to start with
         SelectRandomBlock();
 
@@ -151,7 +154,14 @@ public class PlayerController : MonoBehaviour
             }
 
             // Create a new preview block at the new mouse position (visual only, no grid registration)
-            currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlockData.blockPrefab);
+            if (currentBlock != null && currentBlock.blockPrefab != null)
+            {
+                currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlock.blockPrefab);
+            }
+            else if (currentBlock != null)
+            {
+                Debug.LogWarning($"Block {currentBlock.blockName} has null prefab!");
+            }
 
             // Update last position
             lastMouseGridPosition = mouseGridPos;
@@ -236,13 +246,13 @@ public class PlayerController : MonoBehaviour
         return lastMouseGridPosition;
     }
 
-    // Public method to set a cell at a specific grid position
-    public void SetCellAtGridPosition(int x, int y, Color color)
+    // Public method to set a block at a specific grid position
+    public void SetBlockAtGridPosition(int x, int y, Color color)
     {
-        if (levelGridManager != null && currentBlockData != null)
+        if (levelGridManager != null && currentBlock != null && currentBlock.blockPrefab != null)
         {
-            GameObject newBlock = levelGridManager.DrawBlock(x, y, currentBlockData.blockPrefab);
-            levelGridManager.SetCell(x, y, currentBlockData, true, color);
+            // Use SetBlock instead of SetCell to place the entire block pattern
+            levelGridManager.SetBlock(x, y, currentBlock.blockPrefab, currentBlock);
         }
     }
 
@@ -263,8 +273,16 @@ public class PlayerController : MonoBehaviour
     public void SnapBlock(Vector2Int mouseGridPos, Vector2Int PlayerPivotGridPos)
     {
         // we reached the bottom of the grid, keep the bloc in position and reset the block height
-        GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
-        levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData, true, cellColor);
+        if (currentBlock != null && currentBlock.blockPrefab != null)
+        {
+            // Use SetBlock to place the entire block pattern on the grid
+            levelGridManager.SetBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlock.blockPrefab, currentBlock);
+        }
+        else
+        {
+            Debug.LogWarning("Cannot snap block: currentBlock or its prefab is null!");
+            return;
+        }
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
         
@@ -303,18 +321,33 @@ public class PlayerController : MonoBehaviour
 
     // GESTION DES DIFFERENTS TYPES DE BLOC / SELECTION / RANDOMISATION
     
-    public BlockData[] availableBlocks; // Liste des blocs disponibles
-    public BlockData currentBlockData; // Bloc actuellement sélectionné
+    public Block[] availableBlocks; // Liste des blocs disponibles
+    public Block currentBlock; // Bloc actuellement sélectionné
+
+    private void InitializeBlocks()
+    {
+        availableBlocks = new Block[]
+        {
+            new Block_JumpPad_1(),
+            new Block_Simple_1()
+        };
+        
+        Debug.Log($"Initialized {availableBlocks.Length} blocks");
+        foreach (Block block in availableBlocks)
+        {
+            Debug.Log($"Block initialized: {block.blockName}");
+        }
+    }
 
     public void SelectRandomBlock()
     {
-        // Select a random block prefab from the array
-        if (availableBlocks.Length > 0)
+        // Select a random block from the array
+        if (availableBlocks != null && availableBlocks.Length > 0)
         {
             int randomIndex = Random.Range(0, availableBlocks.Length);
-            currentBlockData = availableBlocks[randomIndex];
-            GameObject currentBlockPrefab = currentBlockData.blockPrefab;
-            Debug.Log("Selected Block: " + currentBlockData.blockName);
+            currentBlock = availableBlocks[randomIndex];
+            
+            Debug.Log("Selected Block: " + currentBlock.blockName);
         }
         else
         {

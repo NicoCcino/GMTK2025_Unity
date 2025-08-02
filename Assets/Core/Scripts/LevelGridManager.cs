@@ -144,9 +144,8 @@ public class LevelGridManager : MonoBehaviour
         }
     }
 
-    public void SetBlock(int x, int y, GameObject blockPrefab, BlockData blockData)
+    public void SetBlock(int x, int y, GameObject blockPrefab, Block block)
     {
-
         // Le pivot du bloc est au centre de la matrice 3x3
         // On va donc placer les cellules du bloc autour de ce pivot
 
@@ -169,22 +168,20 @@ public class LevelGridManager : MonoBehaviour
 
                 if (!LevelGrid.InBounds(worldX, worldY)) continue;
 
-                Cell blockCell = blockData.blockMatrix[i, j];
+                Cell blockCell = block.blockMatrix[i, j];
 
                 // Clone la cellule pour éviter les références partagées
                 Cell cellInstance = new Cell(
-                    blockCell.blockGO,
-                    blockData,
+                    block.blockPrefab,  // Use the actual prefab reference
+                    block,
                     new Vector2Int(i, j)
                 );
-                SetCell(worldX, worldY, cellInstance.blockGO, cellInstance.blockData, cellInstance.positionInBlockDataMatrix);
+                SetCell(worldX, worldY, block.blockPrefab, cellInstance.block, cellInstance.positionInBlockMatrix);
             }
         }
-
-
     }
 
-    public void SetCell(int x, int y, GameObject blockPrefab, BlockData blockData, Vector2Int posInBlockDataMatrix)
+    public void SetCell(int x, int y, GameObject blockPrefab, Block block, Vector2Int posInBlockMatrix)
     {
         // Check if the coordinates are within bounds
         if (!LevelGrid.InBounds(x, y)) return;
@@ -195,10 +192,8 @@ public class LevelGridManager : MonoBehaviour
             Destroy(LevelGrid.grid[x, y].blockGO);
         }
 
-        // GameObject newBlockGO = DrawBlock(x, y, currentBlockData.blockPrefab);
-
         // Gestion des cellules dans grille
-        Cell newCell = new Cell(blockPrefab, blockData, posInBlockDataMatrix);
+        Cell newCell = new Cell(blockPrefab, block, posInBlockMatrix);
 
         // Enregistrement du bloc dans la grille
         LevelGrid.grid[x, y] = newCell;
