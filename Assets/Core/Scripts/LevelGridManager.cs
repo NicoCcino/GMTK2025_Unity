@@ -122,8 +122,10 @@ public class LevelGridManager : MonoBehaviour
         return newBlockGO; // Donne l'instance du bloc 3D crée en sortie
     }
 
-    public void MoveDrawBlock(int directionX, int directionY, GameObject blockPrefab)
+    public void MoveDrawBlock(int BlockToMoveX, int BlockToMoveY, int directionX, int directionY)
     {
+        //Récupère le bloc à déplacer
+        GameObject blockPrefab = LevelGrid.grid[BlockToMoveX, BlockToMoveY].gameObject;
         // Déplace le bloc dans la direction spécifiée
         blockPrefab.transform.Translate(new Vector3(directionX, directionY, 0));
 
