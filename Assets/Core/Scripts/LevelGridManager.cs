@@ -170,13 +170,20 @@ public class LevelGridManager : MonoBehaviour
 
                 Cell blockCell = block.blockMatrix[i, j];
 
-                // Clone la cellule pour éviter les références partagées
-                Cell cellInstance = new Cell(
-                    block.blockPrefab,  // Use the actual prefab reference
-                    block,
-                    new Vector2Int(i, j)
-                );
-                SetCell(worldX, worldY, block.blockPrefab, cellInstance.block, cellInstance.positionInBlockMatrix);
+                // Only place cells that are marked as solid in the block matrix
+                if (block.blockMatrix[i, j].isSolid)
+                {
+                    // Create an actual instance of the block at this position
+                    GameObject blockInstance = DrawBlock(worldX, worldY, block.blockPrefab);
+                    
+                    // Create cell with the instantiated GameObject
+                    Cell cellInstance = new Cell(
+                        blockInstance,  // Use the instantiated GameObject
+                        block,
+                        new Vector2Int(i, j)
+                    );
+                    SetCell(worldX, worldY, blockInstance, cellInstance.block, cellInstance.positionInBlockMatrix);
+                }
             }
         }
     }
@@ -187,9 +194,13 @@ public class LevelGridManager : MonoBehaviour
         if (!LevelGrid.InBounds(x, y)) return;
 
         // If there's already a drawn block at this position, destroy it
-        if (LevelGrid.grid[x, y] != null)
+        if (LevelGrid.grid[x, y] != null && LevelGrid.grid[x, y].blockGO != null)
         {
-            Destroy(LevelGrid.grid[x, y].blockGO);
+            // Only destroy if it's an instantiated GameObject (has a scene), not a prefab asset
+            if (LevelGrid.grid[x, y].blockGO.scene.IsValid())
+            {
+                Destroy(LevelGrid.grid[x, y].blockGO);
+            }
         }
 
         // Gestion des cellules dans grille
@@ -213,7 +224,11 @@ public class LevelGridManager : MonoBehaviour
 
         if (LevelGrid.grid[x, y] != null)
         {
-            Destroy(LevelGrid.grid[x, y].blockGO); // Destroy the GameObject if it exists
+            // Only destroy if it's an instantiated GameObject (has a scene), not a prefab asset
+            if (LevelGrid.grid[x, y].blockGO != null && LevelGrid.grid[x, y].blockGO.scene.IsValid())
+            {
+                Destroy(LevelGrid.grid[x, y].blockGO); // Destroy the GameObject if it exists
+            }
             LevelGrid.grid[x, y] = null;
         }
     }
@@ -374,7 +389,11 @@ public class LevelGridManager : MonoBehaviour
             {
                 if (LevelGrid.grid[x, y] != null)
                 {
-                    Destroy(LevelGrid.grid[x, y].blockGO); // On détruit le GameObject du bloc
+                    // Only destroy if it's an instantiated GameObject (has a scene), not a prefab asset
+                    if (LevelGrid.grid[x, y].blockGO != null && LevelGrid.grid[x, y].blockGO.scene.IsValid())
+                    {
+                        Destroy(LevelGrid.grid[x, y].blockGO); // On détruit le GameObject du bloc
+                    }
                     LevelGrid.grid[x, y] = null; // On vide la cellule de la grille
                 }
             }
