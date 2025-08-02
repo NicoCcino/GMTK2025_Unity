@@ -146,8 +146,9 @@ public class PlayerController : MonoBehaviour
                 levelGridManager.ClearCell(lastMouseGridPosition.x, lastMouseGridPosition.y);
             }
 
-            // Set the cell at the new mouse position using LevelGridManager's SetCell function
-            levelGridManager.SetCell(mouseGridPos.x, mouseGridPos.y, cellColor);
+            // Create a new block at the new mouse position using DrawBlock and SetCell
+            GameObject newBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlockData.blockPrefab);
+            levelGridManager.SetCell(mouseGridPos.x, mouseGridPos.y, newBlock, false, cellColor);
 
             // Update last position
             lastMouseGridPosition = mouseGridPos;
@@ -156,7 +157,8 @@ public class PlayerController : MonoBehaviour
             {
                 // we reached the bottom of the grid, keep the bloc in position and reset the block height
                 ResetBlockHeight();
-                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, cellColor);
+                newBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
+                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, newBlock, true, cellColor);
                 lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
             }
             // if cell under mouseGridPos is set
@@ -164,7 +166,8 @@ public class PlayerController : MonoBehaviour
             {
                 // The cell under mouseGridPos is set
                 ResetBlockHeight();
-                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, cellColor);
+                newBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
+                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, newBlock, true, cellColor);
                 lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
             }
         }
@@ -226,9 +229,10 @@ public class PlayerController : MonoBehaviour
     // Public method to set a cell at a specific grid position
     public void SetCellAtGridPosition(int x, int y, Color color)
     {
-        if (levelGridManager != null)
+        if (levelGridManager != null && currentBlockData != null)
         {
-            levelGridManager.SetCell(x, y, color);
+            GameObject newBlock = levelGridManager.DrawBlock(x, y, currentBlockData.blockPrefab);
+            levelGridManager.SetCell(x, y, newBlock, true, color);
         }
     }
 
