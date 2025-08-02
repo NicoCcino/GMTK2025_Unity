@@ -70,15 +70,21 @@ public class PlayerController : MonoBehaviour
         fallTimer = 0f;
         blockSpeed = blockFallSpeed;
 
+        // Ensure position is synchronized with initial height
+        UpdateBlockPosition();
+
         // Record start time for initialization delay
         startTime = Time.time;
     }
 
     void Update()
     {
-        CollisionUpdate();
-        HandleMouseInput();
+        // Update block falling first to ensure currentBlockHeight is current
         UpdateBlockFalling();
+        // Update mouse position to ensure lastMouseGridPosition uses current height
+        HandleMouseInput();
+        // Run collision detection last with up-to-date positions
+        CollisionUpdate();
     }
 
     void HandleMouseInput()
@@ -194,6 +200,19 @@ public class PlayerController : MonoBehaviour
         
         // Prevent collision detection for a brief moment after startup to avoid immediate snapping
         if (Time.time - startTime < initializationDelay) return;
+        
+        // Ensure position is current before collision detection
+        if (levelGridManager.player != null)
+        {
+            Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+            Vector2Int expectedPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
+            
+            // If position is out of sync with current height, update it
+            if (lastMouseGridPosition.y != expectedPosition.y)
+            {
+                lastMouseGridPosition = expectedPosition;
+            }
+        }
         bool haveSolidCell = false;
         isBlockedLeft = false;
         isBlockedRight = false;
@@ -343,6 +362,19 @@ public class PlayerController : MonoBehaviour
         {
             currentBlockHeight = currentBlockHeight - 1;
             fallTimer = 0f;
+            
+            // Immediately update position when height changes to prevent desync
+            UpdateBlockPosition();
+        }
+    }
+
+    // Update the block position based on current height - ensures position stays in sync
+    private void UpdateBlockPosition()
+    {
+        if (levelGridManager != null && levelGridManager.player != null)
+        {
+            Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+            lastMouseGridPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
         }
     }
 
@@ -364,6 +396,9 @@ public class PlayerController : MonoBehaviour
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
 
+        // Update position to match new height
+        UpdateBlockPosition();
+
         // Advance in block queue = get next block + generate a new one last in the queue
         AdvanceBlockQueue();
 
@@ -380,7 +415,6 @@ public class PlayerController : MonoBehaviour
             Destroy(currentPreviewBlock);
             currentPreviewBlock = null;
         }
-        lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
 
         // Trigger a cam shake effect when resetting the block height
         CameraShake cameraShake = FindFirstObjectByType<CameraShake>();
