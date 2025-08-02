@@ -31,6 +31,10 @@ public class PlayerController : MonoBehaviour
     private bool isBlockedLeft;
     private bool isBlockedRight;
     private bool shouldSnapBlock;
+    
+    // Timer to prevent early collision detection at startup
+    private float initializationDelay = 0.1f; // Small delay to prevent startup collision issues
+    private float startTime;
 
     void Start()
     {
@@ -44,6 +48,12 @@ public class PlayerController : MonoBehaviour
         if (levelGridManager == null)
         {
             levelGridManager = FindFirstObjectByType<LevelGridManager>();
+        }
+
+        // Find UIManager if not assigned
+        if (uiManager == null)
+        {
+            uiManager = FindFirstObjectByType<UIManager>();
         }
 
         // Initialize available blocks
@@ -60,7 +70,8 @@ public class PlayerController : MonoBehaviour
         fallTimer = 0f;
         blockSpeed = blockFallSpeed;
 
-
+        // Record start time for initialization delay
+        startTime = Time.time;
     }
 
     void Update()
@@ -180,6 +191,9 @@ public class PlayerController : MonoBehaviour
     void CollisionUpdate()
     {
         if (levelGridManager == null) return;
+        
+        // Prevent collision detection for a brief moment after startup to avoid immediate snapping
+        if (Time.time - startTime < initializationDelay) return;
         bool haveSolidCell = false;
         isBlockedLeft = false;
         isBlockedRight = false;
@@ -398,7 +412,7 @@ public class PlayerController : MonoBehaviour
         availableBlocks = new Block[]
         {
             // new Block_JumpPad_1(),
-            // new Block_T_5()
+            new Block_T_5(),
             new Block_Simple_1()
         };
 
@@ -420,10 +434,28 @@ public class PlayerController : MonoBehaviour
         Debug.Log(blockQueue[1].blockName);
         Debug.Log(blockQueue[2].blockName);
 
-        uiManager.UpdateBlocksQueuePreview(blockQueue);
+        if (IsUIManagerReady())
+        {
+            uiManager.UpdateBlocksQueuePreview(blockQueue);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager not ready (missing or UI components not assigned), cannot update block queue preview");
+        }
     }
 
     public UIManager uiManager;
+
+    // Check if UIManager is properly configured with all required components
+    private bool IsUIManagerReady()
+    {
+        if (uiManager == null) return false;
+        
+        // Check if the preview images are assigned (required for UpdateBlocksQueuePreview)
+        return uiManager.previewBlockImage1 != null && 
+               uiManager.previewBlockImage2 != null && 
+               uiManager.previewBlockImage3 != null;
+    }
 
     public void AdvanceBlockQueue()
     {
@@ -441,7 +473,14 @@ public class PlayerController : MonoBehaviour
         currentBlock = blockQueue[0];
 
         // Met à jour les previews
-        uiManager.UpdateBlocksQueuePreview(blockQueue);
+        if (IsUIManagerReady())
+        {
+            uiManager.UpdateBlocksQueuePreview(blockQueue);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager not ready (missing or UI components not assigned), cannot update block queue preview");
+        }
     }
 
     public Block GetRandomBlock()
