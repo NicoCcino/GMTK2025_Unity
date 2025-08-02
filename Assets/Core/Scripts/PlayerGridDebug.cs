@@ -6,8 +6,10 @@ public class PlayerGridDebug : MonoBehaviour
     public GameObject player;
     public LevelGridManager levelGridManager;
     private Transform playerTransform;
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
+
         if (playerTransform != null)
         {
             Gizmos.color = Color.red;
@@ -21,7 +23,7 @@ public class PlayerGridDebug : MonoBehaviour
 
         }
     }
-
+#endif
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

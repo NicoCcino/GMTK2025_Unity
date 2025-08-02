@@ -151,23 +151,39 @@ public class LevelGridManager : MonoBehaviour
         int gridHeight = LevelGrid.grid.GetLength(1);
         //Debug.Log("gridHeight: " + gridHeight);
 
-         // Create an actual instance of the block at this position
+        // Create an actual instance of the block at this position
         GameObject blockInstance = DrawBlock(x, y, block.blockPrefab);
 
         for (int i = 0; i < 3; i++) // Pour chaque cellule de la matrice du bloc
         {
             for (int j = 0; j < 3; j++)
             {
-                int cellWorldPosX = x + i - 1;
-                int cellWorldPosY = y + j ; 
-                Debug.Log($"Setting cell at ({i}, {j}) in matrix of {block.blockName} at position ({cellWorldPosX}, {cellWorldPosY})");
-                Cell cell = block.blockMatrix[i, j];
-                if (cell != null && cell.isSolid) // Si la cellule est solide
+                int worldGridPosX = x + i - 1;
+                int worldGridPosY = y + j;
+                Debug.Log($"Trying to set cell at ({i}, {j}) in matrix of {block.blockName} at position ({worldGridPosX}, {worldGridPosY})");
+
+                // Vérifie si les coordonnées sont dans les limites de la grille
+                if (worldGridPosX >= 0 && worldGridPosX < gridWidth &&
+                    worldGridPosY >= 0 && worldGridPosY < gridHeight)
                 {
-                    // On place la cellule dans la grille en définissant les coordonnées à partir du centre x,y
-                    SetCell(cellWorldPosX, cellWorldPosY, blockInstance, block, new Vector2Int(i, j));
-                    Debug.Log($"Cell at ({cellWorldPosX}, {cellWorldPosY}) set with cell {cell} which is isSolid: {cell.isSolid}");
+                    Cell cell = block.blockMatrix[i, j];
+                    if (cell != null && cell.isSolid) // Si la cellule est solide
+                    {
+                        // Si la case de grille est vide ou contient une cellule non solide
+                        if (LevelGrid.grid[worldGridPosX, worldGridPosY] == null || !LevelGrid.grid[worldGridPosX, worldGridPosY].isSolid)
+                        {
+                            // On place la cellule dans la grille en définissant les coordonnées à partir du centre x,y
+                            SetCell(worldGridPosX, worldGridPosY, blockInstance, block, new Vector2Int(i, j));
+                            Debug.Log($"Cell at ({worldGridPosX}, {worldGridPosY}) set with cell {cell} which is isSolid: {cell.isSolid}");
+                        }
+
+                    }
                 }
+                else
+                {
+                    Debug.LogWarning($"Tentative de placement hors grille ignorée : ({worldGridPosX}, {worldGridPosY})");
+                }
+
             }
         }
     }
@@ -177,7 +193,7 @@ public class LevelGridManager : MonoBehaviour
         // Check if the coordinates are within bounds
         if (!LevelGrid.InBounds(x, y)) return;
 
-        // If there's already a drawn block at this position, destroy it
+        // If there's already a cell at this position, destroy it
         if (LevelGrid.grid[x, y] != null && LevelGrid.grid[x, y].blockGO != null)
         {
             // Only destroy if it's an instantiated GameObject (has a scene), not a prefab asset
