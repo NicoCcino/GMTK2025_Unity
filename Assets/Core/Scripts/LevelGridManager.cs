@@ -44,7 +44,7 @@ public class LevelGridManager : MonoBehaviour
 
 
         // Applique une rotation selon Z (Unity fonctionne avec Z vers l'écran en 2D vue de dessus)
-        Quaternion rotation = Quaternion.Euler(0f, 0f, blockRotation);
+        Quaternion rotation = Quaternion.Euler(0f, 0f, -blockRotation);
 
         // Place le bloc
         GameObject newBlockGO = Instantiate(blockPrefab, worldPos, rotation, this.transform);
