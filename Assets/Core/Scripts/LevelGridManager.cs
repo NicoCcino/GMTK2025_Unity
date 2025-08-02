@@ -7,8 +7,6 @@ public class LevelGridManager : MonoBehaviour
 
     [Header("Blocks Settings")]
 
-    public BlockData[] availableBlocks; // Liste des blocs disponibles
-    public BlockData currentBlockData; // Bloc actuellement sélectionné
     public float blockHeightOffset = -1;
 
     public GameObject floorPrefab;
@@ -36,22 +34,6 @@ public class LevelGridManager : MonoBehaviour
     [Tooltip("Reference to the player GameObject")]
 
     public float minDistanceToTeleportChunk = 50f;
-
-    public void SelectRandomBlock()
-    {
-        // Select a random block prefab from the array
-        if (availableBlocks.Length > 0)
-        {
-            int randomIndex = Random.Range(0, availableBlocks.Length);
-            currentBlockData = availableBlocks[randomIndex];
-            GameObject currentBlockPrefab = currentBlockData.blockPrefab;
-            Debug.Log("Selected Block: " + currentBlockData.blockName);
-        }
-        else
-        {
-            Debug.LogWarning("No block available to select.");
-        }
-    }
 
     public void BlockHit(int gridHitX, int gridHitY, BlockData blockData, int blockHitX, int blockHitY, int blockRotation = 0)
     {
@@ -159,24 +141,24 @@ public class LevelGridManager : MonoBehaviour
         }
     }
 
-    public void SetCell(int x, int y, Color color)
+    public void SetCell(int x, int y, GameObject blockPrefab, bool isSolid, Color color)
     {
         // Check if the coordinates are within bounds
         if (!LevelGrid.InBounds(x, y)) return;
 
+        // If there's already a drawn block at this position, destroy it
         if (LevelGrid.grid[x, y] != null)
         {
             Destroy(LevelGrid.grid[x, y].gameObject);
         }
 
-        GameObject newBlockGO = DrawBlock(x, y, currentBlockData.blockPrefab);
-
+        // GameObject newBlockGO = DrawBlock(x, y, currentBlockData.blockPrefab);
 
         // Gestion des cellules dans grille
-        Cell newCell = new Cell(newBlockGO, new Vector2Int(x, y), color);
+        Cell newCell = new Cell(blockPrefab, new Vector2Int(x, y), color);
 
         // Enregistrement du bloc dans la grille
-        newCell.isSolid = true; // On marque la cellule comme solide
+        newCell.isSolid = isSolid; // On marque la cellule comme solide ou non
         LevelGrid.grid[x, y] = newCell;
     }
 
@@ -344,8 +326,6 @@ public class LevelGridManager : MonoBehaviour
         //Debug.Log($"World to Grid: (50,50,0) -> {WorldToGrid(new Vector3(50, 50, 0))}");
         //Debug.Log($"World to Grid: (99,1,0) -> {WorldToGrid(new Vector3(99, 1, 0))}");
         //Debug.Log($"World to Grid: (150,1,0) -> {WorldToGrid(new Vector3(150, 1, 0))}");
-
-        SelectRandomBlock();
 
         gridOriginBackup = gridOrigin.position;
 
