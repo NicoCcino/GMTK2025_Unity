@@ -4,7 +4,11 @@ public class Block_Simple_1 : Block
 {
     public Block_Simple_1() : base("Simple Block", "Prefab_Block_Simple_1")
     {
-        // Set all cells to solid for a simple 1x1 block
+        // Pattern (3x3 matrix - visual representation):
+        // [0,2] [1,2] [2,2]     O O O
+        // [0,1] [1,1] [2,1]  =  O X O  
+        // [0,0] [1,0] [2,0]     O O O
+        
         if (blockMatrix != null)
         {
             blockMatrix[1, 1].isSolid = true;  // Center cell is solid
