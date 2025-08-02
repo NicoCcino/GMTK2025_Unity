@@ -48,7 +48,8 @@ public class PlayerController : MonoBehaviour
         lastMouseGridPosition = new Vector2Int(0, currentBlockHeight);
 
         // Initialize block falling system
-        ResetBlockHeight();
+        currentBlockHeight = initialBlocHeight;
+        fallTimer = 0f;
         blockSpeed = blockFallSpeed;
 
 
@@ -154,35 +155,9 @@ public class PlayerController : MonoBehaviour
             // Update last position
             lastMouseGridPosition = mouseGridPos;
             // We have to compute if we keep this new bloc position or not
-            if (PlayerPivotGridPos.y + currentBlockHeight <= 0)
+            if ((PlayerPivotGridPos.y + currentBlockHeight <= 0) || (mouseGridPos.y - 1 >= 0 && LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null))
             {
-                // we reached the bottom of the grid, keep the bloc in position and reset the block height
-                GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
-                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, permanentBlock, true, cellColor);
-                ResetBlockHeight();
-                // Destroy preview block and create permanent block
-                if (currentPreviewBlock != null)
-                {
-                    Destroy(currentPreviewBlock);
-                    currentPreviewBlock = null;
-                }
-                lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
-            }
-            // if cell under mouseGridPos is set
-            if (mouseGridPos.y - 1 >= 0 && LevelGrid.grid[mouseGridPos.x, mouseGridPos.y - 1] != null)
-            {
-                // The cell under mouseGridPos is set
-                GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
-                levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, permanentBlock, true, cellColor);
-                ResetBlockHeight();
-                
-                // Destroy preview block and create permanent block
-                if (currentPreviewBlock != null)
-                {
-                    Destroy(currentPreviewBlock);
-                    currentPreviewBlock = null;
-                }
-                lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
+                SnapBlock(mouseGridPos, PlayerPivotGridPos);
             }
         }
 
@@ -264,12 +239,14 @@ public class PlayerController : MonoBehaviour
     }
 
     // Reset block height to initial value
-    public void ResetBlockHeight()
+    public void SnapBlock(Vector2Int mouseGridPos, Vector2Int PlayerPivotGridPos)
     {
+        // we reached the bottom of the grid, keep the bloc in position and reset the block height
+        GameObject permanentBlock = levelGridManager.DrawBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlockData.blockPrefab);
+        levelGridManager.SetCell(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, permanentBlock, true, cellColor);
         currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
-        blockSpeed = blockFallSpeed;
-
+        
         // Clean up any existing preview block when starting a new block
         if (currentPreviewBlock != null)
         {
@@ -277,9 +254,29 @@ public class PlayerController : MonoBehaviour
             currentPreviewBlock = null;
         }
 
+        // Destroy preview block and create permanent block
+        if (currentPreviewBlock != null)
+        {
+            Destroy(currentPreviewBlock);
+            currentPreviewBlock = null;
+        }
+        lastMouseGridPosition = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
+
         // Trigger a cam shake effect when resetting the block height
         CameraShake cameraShake = FindFirstObjectByType<CameraShake>();
+        if (blockSpeed == blockClickFallSpeed)
+        {
+            cameraShake.shakeMagnitude = 0.2f;
+            cameraShake.shakeDuration = 0.3f;
+        }
+        else
+        {
+            cameraShake.shakeMagnitude = 0.05f;
+            cameraShake.shakeDuration = 0.2f;
+        }
         cameraShake.StartShake();
+
+        blockSpeed = blockFallSpeed;
     }
 
 

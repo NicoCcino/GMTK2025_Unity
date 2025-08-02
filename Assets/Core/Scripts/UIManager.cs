@@ -80,8 +80,18 @@ public class UIManager : MonoBehaviour
     {
         // Logic to restart the game
         Debug.Log("Restarting Game.");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Script_Move_World.isPlayerDead = false; // Reset player state
         moneyManager.money = 0;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void GoToMainMenu()
+    {
+        // Logic to restart the game
+        Debug.Log("Going to Main Menu.");
+        Script_Move_World.isPlayerDead = false; // Reset player state
+        moneyManager.money = 0;
+        SceneManager.LoadScene("Scene_MainMenu");
+
     }
 }
