@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7432171582839390146}
   - component: {fileID: 2632626110189234551}
   - component: {fileID: 8708368853123968355}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: bevel-hq-brick-2x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6139421255870561359}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Prefab_Block_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 6809711112779829895}
   - component: {fileID: 442919156716525921}
   - component: {fileID: 123127546130990274}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: bevel-hq-brick-2x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -218,7 +218,7 @@ GameObject:
   - component: {fileID: 6418240806281685640}
   - component: {fileID: 8004347991805670843}
   - component: {fileID: 4470496918601210464}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: bevel-hq-brick-2x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -304,7 +304,7 @@ GameObject:
   - component: {fileID: 3543950318364584954}
   - component: {fileID: 5998816622643051416}
   - component: {fileID: 3283709438337852709}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: bevel-hq-brick-2x2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
