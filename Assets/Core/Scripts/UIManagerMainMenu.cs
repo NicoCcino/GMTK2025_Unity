@@ -11,6 +11,7 @@ public class UIManagerMainMenu : MonoBehaviour
     [Tooltip("Shop UI references")]
     public TextMeshProUGUI metaMoneyText;
     public TextMeshProUGUI jumpPadPriceText;
+    public TextMeshProUGUI invinciblePadPriceText;
     public Button jumpPadBuyButton;     // Le bouton d'achat dans l'UI
     public Button invinciblePadBuyButton;     // Le bouton d'achat dans l'UI
     public TextMeshProUGUI jumpPadBuyButtonText;   // Le texte affiché sur le bouton
@@ -53,6 +54,8 @@ public class UIManagerMainMenu : MonoBehaviour
         metaMoneyText.text = progressionManager.metaMoney.ToString();
         int jumpPadPrice = 10; // En dur pour l'instant, idéalement devrait être lié au Block
         jumpPadPriceText.text = jumpPadPrice.ToString(); // To string 
+        int invinciblePadPrice = 20; // En dur pour l'instant, idéalement devrait être lié au Block
+        invinciblePadPriceText.text = invinciblePadPrice.ToString(); // To string 
     }
 
 

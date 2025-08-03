@@ -677,6 +677,10 @@ public class PlayerController : MonoBehaviour
         {
             copy = new Block_JumpPad_1();
         }
+         else if (template is Block_InvinciblePad_1)
+        {
+            copy = new Block_InvinciblePad_1();
+        }
         else
         {
             // Generic fallback - create simple block
