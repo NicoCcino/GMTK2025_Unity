@@ -8,6 +8,8 @@ public class CameraShake : MonoBehaviour
     public float shakeMagnitude = 0.5f; // Magnitude of the shake
     private Vector3 originalPosition; // Original position of the camera
 
+    public AudioSource audioSourceOnground;
+
     [ContextMenu("Start Shake")]
     public void StartShake()
     {
@@ -17,6 +19,8 @@ public class CameraShake : MonoBehaviour
             isShaking = true; // Set the shaking flag to true
             InvokeRepeating("Shake", 0f, 0.01f); // Start shaking at regular intervals
             Invoke("StopShake", shakeDuration); // Stop shaking after the specified duration
+            audioSourceOnground.volume = shakeMagnitude *5f;
+            audioSourceOnground.Play(); // Play the shaking sound
         }
     }
 
