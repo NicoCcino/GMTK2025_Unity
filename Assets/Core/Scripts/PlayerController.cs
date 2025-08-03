@@ -36,6 +36,13 @@ public class PlayerController : MonoBehaviour
     // Timer to prevent early collision detection at startup
     private float initializationDelay = 0.1f; // Small delay to prevent startup collision issues
     private float startTime;
+    
+    // Cached player pivot position to avoid repeated calculations
+    private Vector2Int cachedPlayerPivotGridPos;
+    private bool playerPivotCacheValid = false;
+    
+    // Cache previous mouse grid position to avoid unnecessary preview updates
+    private Vector2Int previousMouseGridPos;
 
     void Start()
     {
@@ -71,6 +78,9 @@ public class PlayerController : MonoBehaviour
 
         // Initialize last mouse grid position
         lastMouseGridPosition = new Vector2Int(5, currentBlockHeight);
+        
+        // Initialize previous mouse grid position cache
+        previousMouseGridPos = lastMouseGridPosition;
 
         // Initialize block falling system
         currentBlockHeight = initialBlocHeight;
@@ -88,6 +98,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // Invalidate player pivot cache at start of frame (player might have moved)
+        playerPivotCacheValid = false;
+        
         // Update block falling first to ensure currentBlockHeight is current
         UpdateBlockFalling();
         // Update mouse position to ensure lastMouseGridPosition uses current height
@@ -102,15 +115,16 @@ public class PlayerController : MonoBehaviour
 
         // Get mouse position in screen coordinates using the new Input System
         Vector2 mouseScreenPos = mouse.position.ReadValue();
-
-        // Convert screen position to viewport coordinates (0-1 range)
+        
+        // Always compute mouse grid position (camera moves even if mouse doesn't)
+        // Convert screen position to viewport coordinates (0-1 range) - cache for reuse
         Vector3 viewportPos = mainCamera.ScreenToViewportPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, 0));
 
         // Check if mouse is within the game viewport (0-1 range)
-        if (viewportPos.x < 0 || viewportPos.x > 1 || viewportPos.y < 0 || viewportPos.y > 1)
-        {
-            return;
-        }
+        // if (viewportPos.x < 0 || viewportPos.x > 1 || viewportPos.y < 0 || viewportPos.y > 1)
+        // {
+        //     return;
+        // }
 
         // For camera facing front (orthogonal to Z axis), we need to cast a ray to the Z=0 plane
         Vector3 mouseWorldPos;
@@ -120,8 +134,8 @@ public class PlayerController : MonoBehaviour
             float height = 2f * mainCamera.orthographicSize;
             float width = height * mainCamera.aspect;
 
-            // Convert screen position to normalized viewport coordinates (0-1)
-            Vector3 viewportPoint = mainCamera.ScreenToViewportPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, 0));
+            // Reuse cached viewport coordinates (avoid duplicate ScreenToViewportPoint call)
+            Vector3 viewportPoint = viewportPos;
 
             // Convert to world coordinates on Z=0 plane
             float worldX = (viewportPoint.x - 0.5f) * width;
@@ -156,7 +170,7 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+        Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
         mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
         if (mouseGridPos.x < 0)
         {
@@ -167,8 +181,11 @@ public class PlayerController : MonoBehaviour
             mouseGridPos = new Vector2Int(mouseGridPos.x, 0);
         }
 
-        // Only update if the grid position has changed
-        if (mouseGridPos != lastMouseGridPosition)
+        // Only update preview if the grid position has changed (optimization)
+        bool mouseGridPosChanged = mouseGridPos != previousMouseGridPos;
+        previousMouseGridPos = mouseGridPos;
+        
+        if (mouseGridPosChanged)
         {
             // Destroy the previous preview block if it exists
             if (currentPreviewBlock != null)
@@ -186,12 +203,12 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.LogWarning($"Block {currentBlock.blockName} has null prefab!");
             }
-
-            // Update last position
-            lastMouseGridPosition = mouseGridPos;
         }
+        
+        // Always update lastMouseGridPosition for collision detection (even if preview didn't change)
+        lastMouseGridPosition = mouseGridPos;
 
-        // Handle left mouse click and release
+        // Handle left mouse click and release (always process clicks, regardless of mouse movement)
         if (mouse.leftButton.wasPressedThisFrame)
         {
             blockSpeed = blockClickFallSpeed;
@@ -217,7 +234,7 @@ public class PlayerController : MonoBehaviour
         // Ensure position is current before collision detection
         if (levelGridManager.player != null)
         {
-            Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+            Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
             Vector2Int expectedPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
 
             // If position is out of sync with current height, update it
@@ -293,9 +310,9 @@ public class PlayerController : MonoBehaviour
         {
             return false; // Safety check
         }
+        
 
-        // Debug.Log($"CellBlockedRightOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
-
+        
         if (LevelGrid.grid[xChecked, y] != null)
         {
             return true; // There's a block on the right
@@ -328,9 +345,9 @@ public class PlayerController : MonoBehaviour
         {
             return false; // Safety check
         }
+        
 
-        // Debug.Log($"CellBlockedLeftOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
-
+        
         if (LevelGrid.grid[xChecked, y] != null)
         {
             return true; // There's a block on the left
@@ -364,6 +381,20 @@ public class PlayerController : MonoBehaviour
     public Vector2Int GetMouseGridPosition()
     {
         return lastMouseGridPosition;
+    }
+
+    // Get cached player pivot grid position (avoids repeated expensive calculations)
+    private Vector2Int GetPlayerPivotGridPos()
+    {
+        if (!playerPivotCacheValid)
+        {
+            if (levelGridManager != null && levelGridManager.player != null)
+            {
+                cachedPlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+                playerPivotCacheValid = true;
+            }
+        }
+        return cachedPlayerPivotGridPos;
     }
 
     // Update block falling over time
@@ -443,7 +474,7 @@ public class PlayerController : MonoBehaviour
     {
         if (levelGridManager != null && levelGridManager.player != null)
         {
-            Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+            Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
             lastMouseGridPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
         }
     }
@@ -451,7 +482,7 @@ public class PlayerController : MonoBehaviour
     // Reset block height to initial value
     public void SnapBlock(Vector2Int mouseGridPos)
     {
-        Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
+        Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
         // we reached the bottom of the grid, keep the bloc in position and reset the block height
         if (currentBlock != null && currentBlock.blockPrefab != null)
         {
@@ -513,14 +544,14 @@ public class PlayerController : MonoBehaviour
 
     public Block[] blockQueue = new Block[3];
 
-    // private void InitializeBlocks()
-    // {
-    //     availableBlocks = new Block[]
-    //     {
-    //         // new Block_JumpPad_1(),
-    //         new Block_T_5(),
-    //         new Block_Simple_1()
-    //     };
+    private void InitializeBlocks()
+    {
+        availableBlocks = new Block[]
+        {
+            new Block_JumpPad_1(),
+            new Block_T_5(),
+            new Block_Simple_1()
+        };
 
     //     Debug.Log($"Initialized {availableBlocks.Length} blocks");
     //     foreach (Block block in availableBlocks)
