@@ -39,7 +39,7 @@ public class TransparentPreviewGenerator
 
                 // Position camera to see prefab
                 instance.transform.position = Vector3.zero;
-                cam.transform.position = new Vector3(0, 1.7f, -10);
+                cam.transform.position = new Vector3(0, 1.2f, -10);
                 //cam.transform.LookAt(instance.transform);
 
                 // Render
