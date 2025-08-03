@@ -1666,6 +1666,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawBlockHeightOffset: 0.5
   simpleBlockPrefab: {fileID: 6472476151444608372, guid: b69a18c7d91265b41accb528c789babe, type: 3}
+  standardBlockPrefab: {fileID: 6472476151444608372, guid: b69a18c7d91265b41accb528c789babe, type: 3}
+  jumpPadBlockPrefab: {fileID: 9154117345118230043, guid: e116fd54da5c71446be3b889026c3b0b, type: 3}
+  invinciblePadBlockPrefab: {fileID: 9154117345118230043, guid: ae2cd7c31a17bba4f8b83e9883a6c8e6, type: 3}
   player: {fileID: 2021525336}
   playerGridPosition: {x: 0, y: 0}
   gizmoColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
