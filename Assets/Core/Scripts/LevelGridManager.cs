@@ -144,6 +144,13 @@ public class LevelGridManager : MonoBehaviour
         return LevelGrid.grid[x, y].isSolid; // Return if the cell is solid
     }
 
+    public bool IsCellABlock(int x, int y) // is there a solid cell at this position?
+    {
+        if (!LevelGrid.InBounds(x, y)) return false; // Out of bounds, no solid cell
+        if (LevelGrid.grid[x, y] == null) return false; // No cell at this position
+        return LevelGrid.grid[x, y].blockType != BlockType.NoBlock; // Return if the cell is solid
+    }
+
 
     public void ClearCell(int x, int y)
     {
