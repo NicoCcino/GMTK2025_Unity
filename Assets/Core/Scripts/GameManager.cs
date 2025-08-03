@@ -1,11 +1,13 @@
 using UnityEngine;
-
+[RequireComponent(typeof(AudioSource))]
 public class GameManager : MonoBehaviour
 {
 
     public UIManager uiManager;
     public ProgressionManager progressionManager;
     public MoneyManager moneyManager;
+    public AudioSource audioSource1;
+    public AudioSource audioSource2;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,8 +38,8 @@ public class GameManager : MonoBehaviour
             uiManager.ShowGameOverScreen();
             progressionManager.metaMoney += moneyManager.money;
             moneyManager.money = 0;
+            audioSource1.Stop();
+            audioSource2.Stop();
         }
-
-
     }
 }
