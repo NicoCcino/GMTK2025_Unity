@@ -151,6 +151,12 @@ public class LevelGridManager : MonoBehaviour
         return LevelGrid.grid[x, y].blockType != BlockType.NoBlock; // Return if the cell is solid
     }
 
+    public BlockType GetBlockType(int x, int y) // get the block type of the cell
+    {
+        if (!LevelGrid.InBounds(x, y)) return BlockType.NoBlock; // Out of bounds, no block
+        if (LevelGrid.grid[x, y] == null) return BlockType.NoBlock; // No cell at this position
+        return LevelGrid.grid[x, y].blockType; // Return the block type
+    }
 
     public void ClearCell(int x, int y)
     {

@@ -21,6 +21,7 @@ public class PlayerJump : MonoBehaviour
 
     private float lastHeightOffset = 0;
     private bool isDead = false;
+    private Vector2Int lastPlayerGridPosition;
 
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
@@ -32,6 +33,7 @@ public class PlayerJump : MonoBehaviour
     void Start()
     {
         PlayerAnimation = FindFirstObjectByType<PlayerAnimation>();
+        lastPlayerGridPosition = levelGridManager.GetPlayerGridPosition();
     }
 
     // Update is called once per frame
@@ -40,32 +42,6 @@ public class PlayerJump : MonoBehaviour
         if (isDead)
         {
             return;
-        }
-        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
-        Vector3 pos = transform.position;
-        
-        // Check if player have to jump obstacle
-        Vector2Int forwardPlayerGridPosition = levelGridManager.WorldToGrid(new Vector3(pos.x + 1f, pos.y, 0));
-        if (((levelGridManager.IsCellSolid(forwardPlayerGridPosition.x+1, forwardPlayerGridPosition.y))
-        || (levelGridManager.IsCellSolid(forwardPlayerGridPosition.x+1, forwardPlayerGridPosition.y+1))
-        || (levelGridManager.IsCellSolid(playerGridPosition.x+1, playerGridPosition.y)))
-        && currentState == PlayerState.Stable)
-        /*
-            LevelGrid.grid[(forwardPlayerGridPosition.x+1)%(LevelGrid.gridWidth-1), forwardPlayerGridPosition.y] != null)
-        || (LevelGrid.grid[(forwardPlayerGridPosition.x+1)%(LevelGrid.gridWidth-1), forwardPlayerGridPosition.y+1] != null)
-        || (LevelGrid.grid[(playerGridPosition.x+1)%(LevelGrid.gridWidth-1), playerGridPosition.y] != null))*/
-        {
-            StartJump();
-        }
-        // Check if player have to jump hole
-        if (playerGridPosition.y > 0)
-        {
-            if ((!levelGridManager.IsCellABlock(playerGridPosition.x + 2, playerGridPosition.y-1)
-                //(LevelGrid.grid[(playerGridPosition.x + 2)%(LevelGrid.gridWidth-1), playerGridPosition.y-1] == null) 
-            && (playerGridPosition.y-1 >= 0))&& currentState == PlayerState.Stable)
-            {
-                StartJump();
-            }
         }
 
         // Call appropriate updater based on state
@@ -82,13 +58,63 @@ public class PlayerJump : MonoBehaviour
                 break;
         }
 
-        // Check death
-        if (levelGridManager.IsCellSolid(playerGridPosition.x, playerGridPosition.y+1))
+        Vector2Int playerGridPosition = levelGridManager.GetPlayerGridPosition();
+        if (lastPlayerGridPosition != playerGridPosition)
         {
-            Debug.Log("Player is dead");
-            // Stop player movement
-            Script_Move_World.isPlayerDead = true;
-            isDead = true;
+            lastPlayerGridPosition = playerGridPosition;
+            Vector3 pos = transform.position;
+            
+            // Check if player have to jump obstacle
+            Vector2Int forwardPlayerGridPosition = levelGridManager.WorldToGrid(new Vector3(pos.x + 1f, pos.y, 0));
+            if (((levelGridManager.IsCellSolid(forwardPlayerGridPosition.x+1, forwardPlayerGridPosition.y))
+            || (levelGridManager.IsCellSolid(forwardPlayerGridPosition.x+1, forwardPlayerGridPosition.y+1))
+            || (levelGridManager.IsCellSolid(playerGridPosition.x+1, playerGridPosition.y)))
+            && currentState == PlayerState.Stable)
+            /*
+                LevelGrid.grid[(forwardPlayerGridPosition.x+1)%(LevelGrid.gridWidth-1), forwardPlayerGridPosition.y] != null)
+            || (LevelGrid.grid[(forwardPlayerGridPosition.x+1)%(LevelGrid.gridWidth-1), forwardPlayerGridPosition.y+1] != null)
+            || (LevelGrid.grid[(playerGridPosition.x+1)%(LevelGrid.gridWidth-1), playerGridPosition.y] != null))*/
+            {
+                StartJump();
+            }
+            // Check if player have to jump hole
+            if (playerGridPosition.y > 0)
+            {
+                if ((!levelGridManager.IsCellABlock(playerGridPosition.x + 2, playerGridPosition.y-1)
+                    //(LevelGrid.grid[(playerGridPosition.x + 2)%(LevelGrid.gridWidth-1), playerGridPosition.y-1] == null) 
+                && (playerGridPosition.y-1 >= 0))&& currentState == PlayerState.Stable)
+                {
+                    StartJump();
+                }
+            }
+
+            // Check death
+            if (levelGridManager.IsCellSolid(playerGridPosition.x, playerGridPosition.y+1))
+            {
+                Debug.Log("Player is dead");
+                // Stop player movement
+                Script_Move_World.isPlayerDead = true;
+                isDead = true;
+                return;
+            }
+
+            // Check special blocks effects
+            if (levelGridManager.IsCellABlock(playerGridPosition.x, playerGridPosition.y))
+            {
+                // We are walking in a bloc that is not solid this is probably a special block
+                // get the block type of the cell
+                BlockType blockType = levelGridManager.GetBlockType(playerGridPosition.x, playerGridPosition.y);
+                if (blockType == BlockType.JumpPad)
+                {
+                    // We are walking in a jump pad
+                    // Start a jump
+                    float backJumpHeight = jumpHeight;
+                    jumpHeight = 5*jumpHeight;
+                    StartJump();
+                    jumpHeight = backJumpHeight;
+                }
+            }
+
         }
     }
 
