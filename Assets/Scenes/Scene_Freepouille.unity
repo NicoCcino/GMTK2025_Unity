@@ -1164,6 +1164,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerPivot
       objectReference: {fileID: 0}
+    - target: {fileID: 9141222646527042379, guid: fca58bf476293ce48883995d162319d0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1951,7 +1955,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelGridManager: {fileID: 718335858}
   cellColor: {r: 0, g: 0, b: 1, a: 1}
-  initialBlocHeight: 5
+  initialBlocHeight: 10
   blockFallSpeed: 1
   blockClickFallSpeed: 0.01
   uiManager: {fileID: 1619843405}
@@ -4066,6 +4070,7 @@ SceneRoots:
   - {fileID: 3491152989586864646}
   - {fileID: 1343141660}
   - {fileID: 1056008645}
+  - {fileID: 426225987}
   - {fileID: 1796535561}
   - {fileID: 6321852119790495391}
   - {fileID: 4062014528184259711}
@@ -4078,4 +4083,3 @@ SceneRoots:
   - {fileID: 6299889136286609210}
   - {fileID: 1469881298808563376}
   - {fileID: 9153399565059730859}
-  - {fileID: 426225987}

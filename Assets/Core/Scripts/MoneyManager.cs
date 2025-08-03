@@ -12,7 +12,7 @@ public class MoneyManager : MonoBehaviour
     void DisplayMoney()
     {
         // This method would typically update a UI element to show the current amount of money
-        Debug.Log("Current Money: " + money);
+        //Debug.Log("Current Money: " + money);
         moneyText.text = money.ToString();
 
     }
@@ -22,7 +22,7 @@ public class MoneyManager : MonoBehaviour
         // Method to add money to the player's total
         money += amount;
         score += amount; // Le score s'incrémente en même temps que l'argent (mais lui ne diminue jamais)
-        Debug.Log("Money added: " + amount + ". Total Money: " + money);
+        //Debug.Log("Money added: " + amount + ". Total Money: " + money);
         DisplayMoney();
     }
 
@@ -32,7 +32,7 @@ public class MoneyManager : MonoBehaviour
         if (money >= amount)
         {
             money -= amount;
-            Debug.Log("Money removed: " + amount + ". Total Money: " + money);
+            //Debug.Log("Money removed: " + amount + ". Total Money: " + money);
 
             DisplayMoney();
         }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -31,13 +32,19 @@ public class PlayerController : MonoBehaviour
     private bool isBlockedLeft;
     private bool isBlockedRight;
     private bool shouldSnapBlock;
-    
+
     // Timer to prevent early collision detection at startup
     private float initializationDelay = 0.1f; // Small delay to prevent startup collision issues
     private float startTime;
 
     void Start()
     {
+        // Init progression manager if not set
+        if (progressionManager == null)
+        {
+            progressionManager = FindFirstObjectByType<ProgressionManager>();
+        }
+
         // Get the main camera
         mainCamera = Camera.main;
 
@@ -57,7 +64,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Initialize available blocks
-        InitializeBlocks();
+        // InitializeBlocks();
 
         // SInitialize Queue with 3 blocks
         InitializeQueue();
@@ -75,6 +82,8 @@ public class PlayerController : MonoBehaviour
 
         // Record start time for initialization delay
         startTime = Time.time;
+
+
     }
 
     void Update()
@@ -201,16 +210,16 @@ public class PlayerController : MonoBehaviour
     void CollisionUpdate()
     {
         if (levelGridManager == null) return;
-        
+
         // Prevent collision detection for a brief moment after startup to avoid immediate snapping
         if (Time.time - startTime < initializationDelay) return;
-        
+
         // Ensure position is current before collision detection
         if (levelGridManager.player != null)
         {
             Vector2Int PlayerPivotGridPos = levelGridManager.WorldToGrid(levelGridManager.player.transform.position);
             Vector2Int expectedPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
-            
+
             // If position is out of sync with current height, update it
             if (lastMouseGridPosition.y != expectedPosition.y)
             {
@@ -232,10 +241,12 @@ public class PlayerController : MonoBehaviour
                 {
                     haveSolidCell = true;
                     // We have to check for collision from the matrix center
-                    if (!isBlockedLeft){
+                    if (!isBlockedLeft)
+                    {
                         isBlockedLeft = CellBlockedLeftOf(cellWorldPos.x, cellWorldPos.y);
                     }
-                    if (!isBlockedRight){
+                    if (!isBlockedRight)
+                    {
                         isBlockedRight = CellBlockedRightOf(cellWorldPos.x, cellWorldPos.y);
                     }
                     if (CellSnapBottomOf(cellWorldPos.x, cellWorldPos.y))
@@ -267,24 +278,24 @@ public class PlayerController : MonoBehaviour
         {
             return false; // Out of bounds, no collision
         }
-        
+
         // Check for cell collision on the right side (with grid wrapping)
         int xChecked = x + 1;
-        
+
         // Handle grid wrapping for X
         if (xChecked >= LevelGrid.gridWidth)
         {
             xChecked = 0; // Wrap to the left side of the grid
         }
-        
+
         // Bounds check for wrapped X coordinate
         if (xChecked < 0 || xChecked >= LevelGrid.gridWidth)
         {
             return false; // Safety check
         }
-        
-        Debug.Log($"CellBlockedRightOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
-        
+
+        // Debug.Log($"CellBlockedRightOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
+
         if (LevelGrid.grid[xChecked, y] != null)
         {
             return true; // There's a block on the right
@@ -302,24 +313,24 @@ public class PlayerController : MonoBehaviour
         {
             return false; // Out of bounds, no collision
         }
-        
+
         // Check for block collision on the left side (with grid wrapping)
         int xChecked = x - 1;
-        
+
         // Handle grid wrapping for X
         if (xChecked < 0)
         {
             xChecked = LevelGrid.gridWidth - 1; // Wrap to the right side of the grid
         }
-        
+
         // Bounds check for wrapped X coordinate
         if (xChecked < 0 || xChecked >= LevelGrid.gridWidth)
         {
             return false; // Safety check
         }
-        
-        Debug.Log($"CellBlockedLeftOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
-        
+
+        // Debug.Log($"CellBlockedLeftOf: checking grid[{xChecked}, {y}] for position ({x}, {y})");
+
         if (LevelGrid.grid[xChecked, y] != null)
         {
             return true; // There's a block on the left
@@ -335,7 +346,7 @@ public class PlayerController : MonoBehaviour
         // Bounds check for X coordinate with wrapping
         if (x < 0) x = LevelGrid.gridWidth - 1;
         if (x >= LevelGrid.gridWidth) x = 0;
-        
+
         // Check if block should snap to ground
         if ((y <= 0) ||
         (y - 1 >= 0 && y - 1 < LevelGrid.gridHeight && LevelGrid.InBounds(x, y - 1) && LevelGrid.grid[x, y - 1] != null))
@@ -365,7 +376,7 @@ public class PlayerController : MonoBehaviour
         {
             currentBlockHeight = currentBlockHeight - 1;
             fallTimer = 0f;
-            
+
             // Immediately update position when height changes to prevent desync
             UpdateBlockPosition();
         }
@@ -377,7 +388,7 @@ public class PlayerController : MonoBehaviour
         {
             // Create a new 3x3 matrix for the rotated result
             Cell[,] rotatedMatrix = new Cell[3, 3];
-            
+
             // Perform 90-degree counterclockwise rotation
             // For each position in the new matrix
             for (int i = 0; i < 3; i++)
@@ -387,7 +398,7 @@ public class PlayerController : MonoBehaviour
                     // Get the source cell from the original matrix
                     // 90° counterclockwise: new[i,j] = old[2-j, i]
                     Cell sourceCell = currentBlock.blockMatrix[2 - j, i];
-                    
+
                     if (sourceCell != null)
                     {
                         // Create a new cell with the rotated position
@@ -403,26 +414,26 @@ public class PlayerController : MonoBehaviour
                     }
                 }
             }
-            
+
             // Replace the original matrix with the rotated one
             currentBlock.blockMatrix = rotatedMatrix;
-            
+
             // Update rotation tracking: increment by 90° and wrap around at 360°
             currentBlock.rotation = (currentBlock.rotation + 90) % 360;
-            
+
             // Update the preview block to show the new rotation immediately
             if (currentPreviewBlock != null)
             {
                 Destroy(currentPreviewBlock);
                 currentPreviewBlock = null;
             }
-            
+
             // Create new preview with rotated block
             if (currentBlock.blockPrefab != null)
             {
                 currentPreviewBlock = levelGridManager.DrawBlock(lastMouseGridPosition.x, lastMouseGridPosition.y, currentBlock.blockPrefab, currentBlock.rotation);
             }
-            
+
             Debug.Log($"Block {currentBlock.blockName} rotated 90° counterclockwise - Current rotation: {currentBlock.rotation}°");
         }
     }
@@ -495,26 +506,28 @@ public class PlayerController : MonoBehaviour
 
     // GESTION DES DIFFERENTS TYPES DE BLOC / SELECTION / RANDOMISATION
 
-    public Block[] availableBlocks; // Liste des blocs disponibles
+    public ProgressionManager progressionManager;
     public Block currentBlock; // Bloc actuellement sélectionné
+
+    // La liste progressionManager.availableBlocks désigne les blocs dispos pour le joueur
 
     public Block[] blockQueue = new Block[3];
 
-    private void InitializeBlocks()
-    {
-        availableBlocks = new Block[]
-        {
-            // new Block_JumpPad_1(),
-            new Block_T_5(),
-            new Block_Simple_1()
-        };
+    // private void InitializeBlocks()
+    // {
+    //     availableBlocks = new Block[]
+    //     {
+    //         // new Block_JumpPad_1(),
+    //         new Block_T_5(),
+    //         new Block_Simple_1()
+    //     };
 
-        Debug.Log($"Initialized {availableBlocks.Length} blocks");
-        foreach (Block block in availableBlocks)
-        {
-            Debug.Log($"Block initialized: {block.blockName}");
-        }
-    }
+    //     Debug.Log($"Initialized {availableBlocks.Length} blocks");
+    //     foreach (Block block in availableBlocks)
+    //     {
+    //         Debug.Log($"Block initialized: {block.blockName}");
+    //     }
+    // }
 
     private void InitializeQueue()
     {
@@ -522,7 +535,7 @@ public class PlayerController : MonoBehaviour
         blockQueue[1] = GetRandomBlock();
         blockQueue[2] = GetRandomBlock();
         currentBlock = blockQueue[0];
-        
+
         // Ensure first block starts with 0 rotation
         if (currentBlock != null)
         {
@@ -549,10 +562,10 @@ public class PlayerController : MonoBehaviour
     private bool IsUIManagerReady()
     {
         if (uiManager == null) return false;
-        
+
         // Check if the preview images are assigned (required for UpdateBlocksQueuePreview)
-        return uiManager.previewBlockImage1 != null && 
-               uiManager.previewBlockImage2 != null && 
+        return uiManager.previewBlockImage1 != null &&
+               uiManager.previewBlockImage2 != null &&
                uiManager.previewBlockImage3 != null;
     }
 
@@ -570,7 +583,7 @@ public class PlayerController : MonoBehaviour
 
         // Met à jour le bloc courant
         currentBlock = blockQueue[0];
-        
+
         // Ensure current block starts with 0 rotation (should already be 0, but double-check)
         if (currentBlock != null)
         {
@@ -590,35 +603,39 @@ public class PlayerController : MonoBehaviour
 
     public Block GetRandomBlock()
     {
-        // Select a random block from the array
-        if (availableBlocks != null && availableBlocks.Length > 0)
+        // Vérifie que la liste existe et n'est pas vide
+        if (progressionManager.availableBlocks != null && progressionManager.availableBlocks.Count > 0)
         {
-            int randomIndex = Random.Range(0, availableBlocks.Length);
-            Block template = availableBlocks[randomIndex];
-            
-            // Create a fresh copy of the selected block to avoid shared rotation state
+            int randomIndex = Random.Range(0, progressionManager.availableBlocks.Count);
+            Block template = progressionManager.availableBlocks[randomIndex];
+
+            Debug.Log("Random block index: " + randomIndex);
+
+
+            // Crée une copie fraîche du bloc sélectionné (pour éviter les références partagées)
             Block newBlock = CreateBlockCopy(template);
-            newBlock.rotation = 0; // Ensure new blocks start with 0 rotation
-            
+            newBlock.rotation = 0; // Assure que la rotation commence à 0
+
             Debug.Log("Random block generated: " + newBlock.blockName + " (rotation: " + newBlock.rotation + "°)");
             return newBlock;
         }
         else
         {
             Debug.LogWarning("No block available to select.");
-            // Crée un bloc vide simple
+            // Crée un bloc simple fallback si la liste est vide
             Block fallback = new Block_Simple_1();
             fallback.blockName = "FallbackBlock";
-            fallback.rotation = 0; // Ensure fallback starts with 0 rotation
+            fallback.rotation = 0;
             return fallback;
         }
     }
+
 
     // Create a copy of a block to avoid shared state issues
     private Block CreateBlockCopy(Block template)
     {
         Block copy;
-        
+
         // Create new instance based on block type
         if (template is Block_T_5)
         {
@@ -638,7 +655,7 @@ public class PlayerController : MonoBehaviour
             copy = new Block_Simple_1();
             copy.blockName = template.blockName + "_Copy";
         }
-        
+
         return copy;
     }
 
