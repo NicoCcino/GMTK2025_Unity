@@ -15,6 +15,6 @@ public class Block_JumpPad_1 : Block
             blockMatrix[1, 1].blockType = BlockType.JumpPad;
         }
 
-        unlockPrice = 10;
+        unlockPrice = 100;
     }
 }

@@ -52,9 +52,9 @@ public class UIManagerMainMenu : MonoBehaviour
     public void UpdateMetaMoneyShopUI()
     {
         metaMoneyText.text = progressionManager.metaMoney.ToString();
-        int jumpPadPrice = 10; // En dur pour l'instant, idéalement devrait être lié au Block
+        int jumpPadPrice = 100; // En dur pour l'instant, idéalement devrait être lié au Block
         jumpPadPriceText.text = jumpPadPrice.ToString(); // To string 
-        int invinciblePadPrice = 20; // En dur pour l'instant, idéalement devrait être lié au Block
+        int invinciblePadPrice = 1000; // En dur pour l'instant, idéalement devrait être lié au Block
         invinciblePadPriceText.text = invinciblePadPrice.ToString(); // To string 
     }
 
