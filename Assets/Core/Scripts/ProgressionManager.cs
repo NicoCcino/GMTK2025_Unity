@@ -18,6 +18,8 @@ public class ProgressionManager : MonoBehaviour
     public bool hasBoughtJumpPad = false;
     public bool hasBoughtInvinciblePad = false;
 
+    public int highScore = 0;
+
     private void Awake()
     {
         // Singleton : garantir qu'il n'y ait qu'une seule instance

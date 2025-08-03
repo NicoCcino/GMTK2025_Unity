@@ -17,6 +17,11 @@ public class UIManagerMainMenu : MonoBehaviour
     public TextMeshProUGUI jumpPadBuyButtonText;   // Le texte affiché sur le bouton
     public TextMeshProUGUI invinciblePadBuyButtonText;   // Le texte affiché sur le bouton
 
+    [Header("Leaderboard UI")]
+    [Tooltip("Leaderboard UI references")]
+
+    public TextMeshProUGUI highscoreText;
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -47,6 +52,7 @@ public class UIManagerMainMenu : MonoBehaviour
     public void InitializeMainMenuUI()
     {
         UpdateMetaMoneyShopUI();
+        UpdateLeaderboardUI();
     }
 
     public void UpdateMetaMoneyShopUI()
@@ -56,6 +62,12 @@ public class UIManagerMainMenu : MonoBehaviour
         jumpPadPriceText.text = jumpPadPrice.ToString(); // To string 
         int invinciblePadPrice = 1000; // En dur pour l'instant, idéalement devrait être lié au Block
         invinciblePadPriceText.text = invinciblePadPrice.ToString(); // To string 
+    }
+
+    public void UpdateLeaderboardUI()
+    {
+        Debug.Log("Trying to update high score in UI");
+        highscoreText.text = progressionManager.highScore.ToString();
     }
 
 

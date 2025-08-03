@@ -36,7 +36,15 @@ public class GameManager : MonoBehaviour
         if (Script_Move_World.isPlayerDead)
         {
             uiManager.ShowGameOverScreen();
+
+            // Update high score
+            if (progressionManager.highScore < moneyManager.money) {
+                progressionManager.highScore = moneyManager.money;
+            }
+            
+            // Update money
             progressionManager.metaMoney += moneyManager.money;
+
             moneyManager.money = 0;
             audioSourceMusic.Stop();
             audioSourceSing.Stop();
