@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Block_L_4 : Block
 {
-    public Block_L_4() : base("Block_T_5", "Prefab_Block_T_5", "Sprite_Block_T_5") // Setup name, Prefab path, Preview Sprite path
+    public Block_L_4() : base("Block_T_5", "Prefab_Block_T_5", "Sprite_Block_L_4") // Setup name, Prefab path, Preview Sprite path
     {
         // Pattern (3x3 matrix - visual representation):
         // [0,2] [1,2] [2,2]     X O O
