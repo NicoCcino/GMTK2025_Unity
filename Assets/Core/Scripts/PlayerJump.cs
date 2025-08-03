@@ -122,7 +122,15 @@ public class PlayerJump : MonoBehaviour
                 {
                     // We are walking in a invincible pad for 1 second
                     isInvincible = System.DateTime.Now.AddSeconds(1);
+                    // TODO : Trigger Invincibility sound effect
                 }
+            }
+
+
+            if (isInvincible != System.DateTime.MinValue) && (System.DateTime.Now > isInvincible)
+            {
+                // TODO : UnTrigger Invincibility sound effect
+                isInvincible = System.DateTime.MinValue;
             }
 
         }
