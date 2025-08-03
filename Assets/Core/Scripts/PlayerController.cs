@@ -516,6 +516,8 @@ public class PlayerController : MonoBehaviour
             currentPreviewBlock = null;
         }
 
+        blockSpeed = blockFallSpeed;
+
         // Trigger a cam shake effect when resetting the block height
         CameraShake cameraShake = FindFirstObjectByType<CameraShake>();
         if (blockSpeed == blockClickFallSpeed)
@@ -530,7 +532,7 @@ public class PlayerController : MonoBehaviour
         }
         cameraShake.StartShake();
 
-        blockSpeed = blockFallSpeed;
+
     }
 
 
