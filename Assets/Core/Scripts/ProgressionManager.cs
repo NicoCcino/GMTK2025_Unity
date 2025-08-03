@@ -34,6 +34,11 @@ public class ProgressionManager : MonoBehaviour
         InitializeAvailableBlocks();
     }
 
+    public void Start()
+    {
+        BuyJumpPad();
+    }
+
 
 
     public List<Block> allBlocks = new List<Block>(); // Liste des blocs programmés
@@ -56,7 +61,7 @@ public class ProgressionManager : MonoBehaviour
         }
     }
 
-        public void InitializeAvailableBlocks()
+    public void InitializeAvailableBlocks()
     {
         availableBlocks = new List<Block>
         {
@@ -74,7 +79,13 @@ public class ProgressionManager : MonoBehaviour
 
     public void BuyBlock(Block newBlock)
     {
-        allBlocks.Add(newBlock);
+        availableBlocks.Add(newBlock);
+    }
+
+    public void BuyJumpPad()
+    {
+        Block blockToBuy = new Block_JumpPad_1();
+        BuyBlock(blockToBuy);
     }
 
     public void UnlockLevel(int level)

@@ -544,14 +544,14 @@ public class PlayerController : MonoBehaviour
 
     public Block[] blockQueue = new Block[3];
 
-    private void InitializeBlocks()
-    {
-        availableBlocks = new Block[]
-        {
-            new Block_JumpPad_1(),
-            new Block_T_5(),
-            new Block_Simple_1()
-        };
+    // private void InitializeBlocks()
+    // {
+    //     availableBlocks = new Block[]
+    //     {
+    //         new Block_JumpPad_1(),
+    //         new Block_T_5(),
+    //         new Block_Simple_1()
+    //     }
 
     //     Debug.Log($"Initialized {availableBlocks.Length} blocks");
     //     foreach (Block block in availableBlocks)
