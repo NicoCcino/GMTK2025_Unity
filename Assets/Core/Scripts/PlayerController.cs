@@ -121,22 +121,14 @@ public class PlayerController : MonoBehaviour
         CollisionUpdate();
     }
 
-    void HandleMouseInput()
+    Vector2Int GetMouseGridPosition()
     {
-        if (levelGridManager == null || mainCamera == null || mouse == null) return;
-
-        // Get mouse position in screen coordinates using the new Input System
+                // Get mouse position in screen coordinates using the new Input System
         Vector2 mouseScreenPos = mouse.position.ReadValue();
 
         // Always compute mouse grid position (camera moves even if mouse doesn't)
         // Convert screen position to viewport coordinates (0-1 range) - cache for reuse
         Vector3 viewportPos = mainCamera.ScreenToViewportPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, 0));
-
-        // Check if mouse is within the game viewport (0-1 range)
-        // if (viewportPos.x < 0 || viewportPos.x > 1 || viewportPos.y < 0 || viewportPos.y > 1)
-        // {
-        //     return;
-        // }
 
         // For camera facing front (orthogonal to Z axis), we need to cast a ray to the Z=0 plane
         Vector3 mouseWorldPos;
@@ -166,7 +158,15 @@ public class PlayerController : MonoBehaviour
             mouseWorldPos.z = 0;
         }
         // Convert world position to grid position using LevelGridManager's WorldToGrid function
-        Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
+        return levelGridManager.WorldToGrid(mouseWorldPos);
+    }
+
+    void HandleMouseInput()
+    {
+        if (levelGridManager == null || mainCamera == null || mouse == null) return;
+
+        // Get mouse position in grid coordinates
+        Vector2Int mouseGridPos = GetMouseGridPosition();
         // We only use the x coordinate of the mouse grid position
         mouseGridPos = new Vector2Int(mouseGridPos.x, lastMouseGridPosition.y);
 
@@ -385,11 +385,6 @@ public class PlayerController : MonoBehaviour
             return false;
         }
     }
-    // Public method to get the current mouse grid position
-    public Vector2Int GetMouseGridPosition()
-    {
-        return lastMouseGridPosition;
-    }
 
     // Get cached player pivot grid position (avoids repeated expensive calculations)
     private Vector2Int GetPlayerPivotGridPos()
@@ -493,6 +488,8 @@ public class PlayerController : MonoBehaviour
             Debug.LogWarning("Cannot snap block: currentBlock or its prefab is null!");
             return;
         }
+        mouseGridPos = GetMouseGridPosition();
+        lastMouseGridPosition = mouseGridPos;
         lastMouseGridPosition.y = PlayerPivotGridPos.y + initialBlocHeight;
         fallTimer = 0f;
 
@@ -515,6 +512,7 @@ public class PlayerController : MonoBehaviour
             Destroy(currentPreviewBlock);
             currentPreviewBlock = null;
         }
+        blockSpeed = blockFallSpeed;
 
         // Trigger a cam shake effect when resetting the block height
         CameraShake cameraShake = FindFirstObjectByType<CameraShake>();
@@ -530,7 +528,6 @@ public class PlayerController : MonoBehaviour
         }
         cameraShake.StartShake();
 
-        blockSpeed = blockFallSpeed;
     }
 
 
