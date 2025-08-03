@@ -688,6 +688,14 @@ public class PlayerController : MonoBehaviour
         {
             copy = new Block_InvinciblePad_1();
         }
+        else if (template is Block_L_4)
+        {
+            copy = new Block_L_4();
+        }
+        else if (template is Block_S_4)
+        {
+            copy = new Block_S_4();
+        }
         else
         {
             // Generic fallback - create simple block
