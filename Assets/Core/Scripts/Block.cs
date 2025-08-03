@@ -1,5 +1,5 @@
 using UnityEngine;
-
+[System.Serializable]
 public class Block
 {
     public string blockName;
@@ -12,6 +12,7 @@ public class Block
     public Cell[,] blockMatrix = new Cell[3, 3]; // Matrice 3x3 du bloc
     public Color color = Color.white;       // Couleur du bloc
     public int rotation = 0;
+    public int unlockPrice = 0;
 
     // Public property for lazy loading
     public GameObject blockPrefab

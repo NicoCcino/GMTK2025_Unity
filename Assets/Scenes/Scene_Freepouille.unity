@@ -119,6 +119,53 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &17883524
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 17883526}
+  - component: {fileID: 17883525}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &17883525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17883524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7950ddc5cde66049816f39b865c4c6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiManager: {fileID: 1619843405}
+  progressionManager: {fileID: 0}
+  moneyManager: {fileID: 0}
+--- !u!4 &17883526
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17883524}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 929.2627, y: 0, z: 1143.3059}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &70537660
 GameObject:
   m_ObjectHideFlags: 0
@@ -1958,7 +2005,7 @@ MonoBehaviour:
   initialBlocHeight: 10
   blockFallSpeed: 1
   blockClickFallSpeed: 0.01
-  progressionManager: {fileID: 0}
+  progressionManager: {fileID: 1755047094}
   uiManager: {fileID: 1619843405}
 --- !u!4 &1056008645
 Transform:
@@ -2951,8 +2998,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b7ae68a9708d324eac6df0f7723a3fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  player: {fileID: 2021525336}
   moneyManager: {fileID: 2049016848}
+  gameManager: {fileID: 17883525}
+  progressionManager: {fileID: 1755047094}
   gameOverScreen: {fileID: 348723319}
   textScoreSentence: {fileID: 759982260}
   previewBlockImage1: {fileID: 282020157}
@@ -3128,8 +3177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e67bec3457d400344b12146dc6ca3da8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLevel: 1
-  totalScore: 0
+  metaMoney: 0
   unlockedLevels: 
 --- !u!4 &1755047095
 Transform:
@@ -4132,3 +4180,4 @@ SceneRoots:
   - {fileID: 1469881298808563376}
   - {fileID: 9153399565059730859}
   - {fileID: 1755047095}
+  - {fileID: 17883526}

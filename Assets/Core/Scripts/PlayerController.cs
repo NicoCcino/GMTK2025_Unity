@@ -36,28 +36,25 @@ public class PlayerController : MonoBehaviour
     // Timer to prevent early collision detection at startup
     private float initializationDelay = 0.1f; // Small delay to prevent startup collision issues
     private float startTime;
-    
+
     // Cached player pivot position to avoid repeated calculations
     private Vector2Int cachedPlayerPivotGridPos;
     private bool playerPivotCacheValid = false;
-    
+
     // Cache previous mouse grid position to avoid unnecessary preview updates
     private Vector2Int previousMouseGridPos;
 
-    void Start()
-    {
-        // Init progression manager if not set
+    // Progression manager
+    public ProgressionManager progressionManager;
+
+    void InitManagers()
+    {   // Init progression manager if not set
+
+        progressionManager = ProgressionManager.Instance;
         if (progressionManager == null)
         {
-            progressionManager = FindFirstObjectByType<ProgressionManager>();
+            Debug.LogWarning("ProgressionManager not found by PlayerController.");
         }
-
-        // Get the main camera
-        mainCamera = Camera.main;
-
-        // Get the mouse device from the new Input System
-        mouse = Mouse.current;
-
         // Find LevelGridManager if not assigned
         if (levelGridManager == null)
         {
@@ -70,6 +67,21 @@ public class PlayerController : MonoBehaviour
             uiManager = FindFirstObjectByType<UIManager>();
         }
 
+    }
+
+    void Start()
+    {
+
+        InitManagers();
+
+        // Get the main camera
+        mainCamera = Camera.main;
+
+        // Get the mouse device from the new Input System
+        mouse = Mouse.current;
+
+
+
         // Initialize available blocks
         // InitializeBlocks();
 
@@ -78,7 +90,7 @@ public class PlayerController : MonoBehaviour
 
         // Initialize last mouse grid position
         lastMouseGridPosition = new Vector2Int(5, currentBlockHeight);
-        
+
         // Initialize previous mouse grid position cache
         previousMouseGridPos = lastMouseGridPosition;
 
@@ -100,7 +112,7 @@ public class PlayerController : MonoBehaviour
     {
         // Invalidate player pivot cache at start of frame (player might have moved)
         playerPivotCacheValid = false;
-        
+
         // Update block falling first to ensure currentBlockHeight is current
         UpdateBlockFalling();
         // Update mouse position to ensure lastMouseGridPosition uses current height
@@ -115,7 +127,7 @@ public class PlayerController : MonoBehaviour
 
         // Get mouse position in screen coordinates using the new Input System
         Vector2 mouseScreenPos = mouse.position.ReadValue();
-        
+
         // Always compute mouse grid position (camera moves even if mouse doesn't)
         // Convert screen position to viewport coordinates (0-1 range) - cache for reuse
         Vector3 viewportPos = mainCamera.ScreenToViewportPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, 0));
@@ -184,7 +196,7 @@ public class PlayerController : MonoBehaviour
         // Only update preview if the grid position has changed (optimization)
         bool mouseGridPosChanged = mouseGridPos != previousMouseGridPos;
         previousMouseGridPos = mouseGridPos;
-        
+
         if (mouseGridPosChanged)
         {
             // Destroy the previous preview block if it exists
@@ -204,7 +216,7 @@ public class PlayerController : MonoBehaviour
                 Debug.LogWarning($"Block {currentBlock.blockName} has null prefab!");
             }
         }
-        
+
         // Always update lastMouseGridPosition for collision detection (even if preview didn't change)
         lastMouseGridPosition = mouseGridPos;
 
@@ -310,9 +322,9 @@ public class PlayerController : MonoBehaviour
         {
             return false; // Safety check
         }
-        
 
-        
+
+
         if (levelGridManager.IsCellSolid(xChecked, y))
         {
             return true; // There's a block on the right
@@ -345,9 +357,9 @@ public class PlayerController : MonoBehaviour
         {
             return false; // Safety check
         }
-        
 
-        
+
+
         if (levelGridManager.IsCellSolid(xChecked, y))
         {
             return true; // There's a block on the left
@@ -425,8 +437,8 @@ public class PlayerController : MonoBehaviour
             {
                 for (int j = 0; j < 3; j++)
                 {
-                        // Copy the solid state
-                    rotatedMatrix[i, j] = currentBlock.blockMatrix[2 - j, i];;
+                    // Copy the solid state
+                    rotatedMatrix[i, j] = currentBlock.blockMatrix[2 - j, i]; ;
 
                 }
             }
@@ -521,8 +533,6 @@ public class PlayerController : MonoBehaviour
 
 
     // GESTION DES DIFFERENTS TYPES DE BLOC / SELECTION / RANDOMISATION
-
-    public ProgressionManager progressionManager;
     public Block currentBlock; // Bloc actuellement sélectionné
 
     // La liste progressionManager.availableBlocks désigne les blocs dispos pour le joueur
@@ -619,6 +629,9 @@ public class PlayerController : MonoBehaviour
 
     public Block GetRandomBlock()
     {
+
+        InitManagers();
+
         // Vérifie que la liste existe et n'est pas vide
         if (progressionManager.availableBlocks != null && progressionManager.availableBlocks.Count > 0)
         {

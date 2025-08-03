@@ -3,16 +3,19 @@
 using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 [DefaultExecutionOrder(-100)]
 public class ProgressionManager : MonoBehaviour
 {
     public static ProgressionManager Instance { get; private set; }
 
-    // Exemple de variables persistantes
-    public int currentLevel = 1;
-    public int totalScore = 0;
+    public int metaMoney = 0;
     public bool[] unlockedLevels;
+
+    public UIManagerMainMenu uiManagerMainMenu;
+
+    public bool hasBoughtJumpPad = false;
 
     private void Awake()
     {
@@ -36,7 +39,8 @@ public class ProgressionManager : MonoBehaviour
 
     public void Start()
     {
-        BuyJumpPad();
+        //CheckRefUIManagerMainMenu();
+        //BuyJumpPad();
     }
 
 
@@ -77,15 +81,38 @@ public class ProgressionManager : MonoBehaviour
         }
     }
 
-    public void BuyBlock(Block newBlock)
+    public bool BuyBlock(Block newBlock, int price = 0)
     {
-        availableBlocks.Add(newBlock);
+        Debug.Log($"Trying to buy block {newBlock.blockName}");
+        price = newBlock.unlockPrice; // Je récupère le coût d'upgrade du bloc
+        Debug.Log($"Price is {price}");
+        if (metaMoney >= price) // Vérifie que l'argent du joueur est suffisant
+        {
+            Debug.Log("Player has enough money and is about to buy");
+            metaMoney -= price; // Update argent
+            uiManagerMainMenu.UpdateMetaMoneyShopUI();         // Update UI argent
+
+            availableBlocks.Add(newBlock); // Ajout du bloc au pool
+            Debug.Log("Block added to available blocks pool from BuyBlock function");
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning("Not enough metaMoney to purchase block");
+            return false;
+        }
     }
 
     public void BuyJumpPad()
     {
+        Debug.Log("BuyJumpPad function started");
         Block blockToBuy = new Block_JumpPad_1();
-        BuyBlock(blockToBuy);
+        if (BuyBlock(blockToBuy) == true)
+        {
+            hasBoughtJumpPad = true; 
+            Debug.Log("Keeping in memory: player has bought jumpPad");
+        }
+
     }
 
     public void UnlockLevel(int level)
@@ -97,5 +124,14 @@ public class ProgressionManager : MonoBehaviour
     public bool IsLevelUnlocked(int level)
     {
         return level >= 0 && level < unlockedLevels.Length && unlockedLevels[level];
+    }
+
+    public void CheckRefUIManagerMainMenu()
+    {
+        if (uiManagerMainMenu == null)
+        {
+            uiManagerMainMenu = FindFirstObjectByType<UIManagerMainMenu>();
+            Debug.Log("Progression Manager found and plugged uiManagerMainMenu");
+        }
     }
 }

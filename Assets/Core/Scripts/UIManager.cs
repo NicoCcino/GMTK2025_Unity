@@ -9,16 +9,19 @@ public class UIManager : MonoBehaviour
     [Tooltip("Reference to the Player GameObject")]
     public GameObject player;
 
-    [Header("Money Manager")]
+    [Header("Managers references")]
     [Tooltip("Reference to the Money Manager")]
     public MoneyManager moneyManager;
-
-
-    [Header("Game Over Screen")]
+    [Tooltip("Reference to the Game Manager")]
+    public GameManager gameManager;
+    [Tooltip("Reference to the Game Manager")]
+    public ProgressionManager progressionManager;
     [Tooltip("Reference to the Game Over screen UI")]
     public GameObject gameOverScreen;
     public TextMeshProUGUI textScoreSentence; // Reference to a UI Text component to display the score sentence
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+                                              // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    
     void Start()
     {
         if (gameOverScreen == null)
@@ -27,6 +30,18 @@ public class UIManager : MonoBehaviour
 
             Debug.LogError("Trying to find Game Over screen in the scene, by name Panel_GameOver");
             gameOverScreen = GameObject.Find("Panel_GameOver");
+        }
+
+        if (gameManager == null)
+        {
+            gameManager = FindFirstObjectByType<GameManager>();
+            Debug.Log("UI Manager found and plugged gameManager");
+        }
+
+        if (progressionManager == null)
+        {
+            progressionManager = FindFirstObjectByType<ProgressionManager>();
+            Debug.Log("UI Manager found and plugged progressionManager");
         }
 
         HideGameOverScreen();
@@ -44,11 +59,6 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Script_Move_World.isPlayerDead)
-        {
-            ShowGameOverScreen();
-        }
-
     }
 
     public void ShowGameOverScreen()
@@ -121,6 +131,5 @@ public class UIManager : MonoBehaviour
         Script_Move_World.isPlayerDead = false; // Reset player state
         moneyManager.money = 0;
         SceneManager.LoadScene("Scene_MainMenu");
-
     }
 }
