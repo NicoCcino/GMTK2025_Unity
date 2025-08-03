@@ -15,6 +15,6 @@ public class Block_InvinciblePad_1 : Block
             blockMatrix[1, 1].blockType = BlockType.InvinciblePad;
         }
 
-        unlockPrice = 20;
+        unlockPrice = 1000;
     }
 }
