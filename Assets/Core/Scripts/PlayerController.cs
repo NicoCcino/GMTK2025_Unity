@@ -426,23 +426,9 @@ public class PlayerController : MonoBehaviour
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    // Get the source cell from the original matrix
-                    // 90° counterclockwise: new[i,j] = old[2-j, i]
-                    Cell sourceCell = currentBlock.blockMatrix[2 - j, i];
-
-                    if (sourceCell != null)
-                    {
-                        // Create a new cell with the rotated position
-                        rotatedMatrix[i, j] = new Cell(sourceCell.blockGO, sourceCell.block, new Vector2Int(i, j));
                         // Copy the solid state
-                        rotatedMatrix[i, j].isSolid = sourceCell.isSolid;
-                    }
-                    else
-                    {
-                        // Create an empty cell at the new position
-                        rotatedMatrix[i, j] = new Cell(null, currentBlock, new Vector2Int(i, j));
-                        rotatedMatrix[i, j].isSolid = false;
-                    }
+                    rotatedMatrix[i, j] = currentBlock.blockMatrix[2 - j, i];;
+
                 }
             }
 

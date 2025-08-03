@@ -107,13 +107,22 @@ public class LevelGridManager : MonoBehaviour
                     worldGridPosY >= 0 && worldGridPosY < gridHeight)
                 {
                     Cell cell = block.blockMatrix[i, j];
-                    if (cell != null && cell.isSolid) // Si la cellule est solide
+                    if ((cell != null && cell.isSolid) || (cell != null && cell.blockType != BlockType.NoBlock)) // Si la cellule est solide
                     {
                         // Si la case de grille est vide ou contient une cellule non solide
                         if (LevelGrid.grid[worldGridPosX, worldGridPosY] == null || !LevelGrid.grid[worldGridPosX, worldGridPosY].isSolid)
                         {
+                                    // If there's already a cell at this position, destroy it
+                            if (LevelGrid.grid[worldGridPosX, worldGridPosY] != null && LevelGrid.grid[worldGridPosX, worldGridPosY].blockGO != null)
+                            {
+                                // Only destroy if it's an instantiated GameObject (has a scene), not a prefab asset
+                                if (LevelGrid.grid[worldGridPosX, worldGridPosY].blockGO.scene.IsValid())
+                                {
+                                    Destroy(LevelGrid.grid[worldGridPosX, worldGridPosY].blockGO);
+                                }
+                            }
                             // On place la cellule dans la grille en définissant les coordonnées à partir du centre x,y
-                            SetCell(worldGridPosX, worldGridPosY, blockInstance, block, new Vector2Int(i, j));
+                            LevelGrid.grid[worldGridPosX, worldGridPosY] = cell;
                             Debug.Log($"Cell at ({worldGridPosX}, {worldGridPosY}) set with cell {cell} which is isSolid: {cell.isSolid}");
                         }
 
@@ -126,32 +135,6 @@ public class LevelGridManager : MonoBehaviour
 
             }
         }
-    }
-
-    public void SetCell(int x, int y, GameObject blockPrefab, Block block, Vector2Int posInBlockMatrix)
-    {
-        // Check if the coordinates are within bounds
-        if (!LevelGrid.InBounds(x, y)) return;
-
-        // If there's already a cell at this position, destroy it
-        if (LevelGrid.grid[x, y] != null && LevelGrid.grid[x, y].blockGO != null)
-        {
-            // Only destroy if it's an instantiated GameObject (has a scene), not a prefab asset
-            if (LevelGrid.grid[x, y].blockGO.scene.IsValid())
-            {
-                Destroy(LevelGrid.grid[x, y].blockGO);
-            }
-        }
-
-        // Gestion des cellules dans grille
-        Cell newCell = new Cell(blockPrefab, block, posInBlockMatrix);
-
-        // Set cell as solid if block says so
-        newCell.isSolid = block.blockMatrix[posInBlockMatrix.x, posInBlockMatrix.y].isSolid;
-
-        // Enregistrement du bloc dans la grille
-        LevelGrid.grid[x, y] = newCell;
-        Debug.Log($"Cell set at ({x}, {y}) with block {block.blockName} with solid state =  at position in block matrix {posInBlockMatrix}");
     }
 
     public bool IsCellSolid(int x, int y) // is there a solid cell at this position?
@@ -233,10 +216,7 @@ public class LevelGridManager : MonoBehaviour
                 // Affiche 0 ou 1 selon présence d'un bloc
                 if (LevelGrid.grid[x, y] != null)
                 {
-                    if (LevelGrid.grid[x, y].isSolid)
-                    {
-                        cellValue = 1; // Affiche 1 si la cellule est solide
-                    }
+                    cellValue = (int)LevelGrid.grid[x, y].blockType; // Affiche 1 si la cellule est solide
                 }
                 // Affiche la valeur de la cellule dans l'éditeur
                 Handles.Label(pos, cellValue.ToString());
@@ -351,9 +331,6 @@ public class LevelGridManager : MonoBehaviour
         EmptyGrid();
         player = GameObject.Find("PlayerPivot");
         moneyManager = GameObject.Find("MoneyManager").GetComponent<MoneyManager>();
-        //SetCell(10, 0, Color.red);
-        //SetCell(52, 1, Color.red);
-        //SetCell(52, 0, Color.red);
 
         //Debug.Log($"World to Grid: (1,1,0) -> {WorldToGrid(new Vector3(1, 1, 0))}");
         //Debug.Log($"World to Grid: (-1,1,0) -> {WorldToGrid(new Vector3(-1, 1, 0))}");

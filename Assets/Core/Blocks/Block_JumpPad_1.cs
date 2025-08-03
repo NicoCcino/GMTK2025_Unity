@@ -11,7 +11,8 @@ public class Block_JumpPad_1 : Block
         
         if (blockMatrix != null)
         {
-            blockMatrix[1, 1].isSolid = true;  // Center bottom cell is solid
+            blockMatrix[1, 1].isSolid = false;  // Center bottom cell is solid
+            blockMatrix[1, 1].blockType = BlockType.JumpPad;
         }
     }
 

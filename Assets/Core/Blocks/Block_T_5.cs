@@ -13,14 +13,18 @@ public class Block_T_5 : Block
         {
             // Top row (y=2)
             blockMatrix[0, 2].isSolid = true;   // Left top
+            blockMatrix[0, 2].blockType = BlockType.Standard;
             blockMatrix[1, 2].isSolid = true;   // Center top  
+            blockMatrix[1, 2].blockType = BlockType.Standard;
             blockMatrix[2, 2].isSolid = true;   // Right top
+            blockMatrix[2, 2].blockType = BlockType.Standard;
             
             // Middle row (y=1)
             blockMatrix[1, 1].isSolid = true;   // Center middle
-            
+            blockMatrix[1, 1].blockType = BlockType.Standard;
             // Bottom row (y=0)
             blockMatrix[1, 0].isSolid = true;   // Center bottom
+            blockMatrix[1, 0].blockType = BlockType.Standard;
         }
     }
 

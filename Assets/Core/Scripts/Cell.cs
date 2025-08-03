@@ -1,5 +1,13 @@
 using UnityEngine;
 
+public enum BlockType
+{
+    NoBlock,
+    Standard,
+    JumpPad,
+    // Add more block types as needed
+}
+
 public class Cell
 {
     public GameObject blockGO;    // L'objet visuel du bloc
@@ -7,6 +15,7 @@ public class Cell
     public Vector2Int positionInBlockMatrix; // Position dans la matrice du bloc
     public bool isSolid;          // Indique si la cellule est solide ou non
     public int value;             // Valeur du bloc
+    public BlockType blockType = BlockType.NoBlock;   // Type du bloc
 
     public Cell(GameObject blockGO, Block block, Vector2Int posInBlockMatrix)
     {

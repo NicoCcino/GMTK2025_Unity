@@ -12,6 +12,7 @@ public class Block_Simple_1 : Block
         if (blockMatrix != null)
         {
             blockMatrix[1, 1].isSolid = true;  // Center cell is solid
+            blockMatrix[1, 1].blockType = BlockType.Standard;
         }
     }
 
