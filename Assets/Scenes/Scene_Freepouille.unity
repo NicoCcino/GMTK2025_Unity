@@ -152,8 +152,8 @@ MonoBehaviour:
   uiManager: {fileID: 1619843405}
   progressionManager: {fileID: 0}
   moneyManager: {fileID: 0}
-  audioSource1: {fileID: 0}
-  audioSource2: {fileID: 0}
+  audioSourceMusic: {fileID: 0}
+  audioSourceSing: {fileID: 0}
 --- !u!4 &17883526
 Transform:
   m_ObjectHideFlags: 0
@@ -1493,7 +1493,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -50}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &759982260
@@ -1516,7 +1516,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You have walked over -1 blocks
+  m_text: 'You have walked over -1 blocks
+
+    Adding $-1 to your piggy bank'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2110,6 +2112,7 @@ MonoBehaviour:
   initialBlocHeight: 10
   blockFallSpeed: 1
   blockClickFallSpeed: 0.01
+  audioSourceRotate: {fileID: 0}
   progressionManager: {fileID: 1755047094}
   currentBlock:
     blockName: 
@@ -2256,7 +2259,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 100}
   m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1112389044
@@ -3711,6 +3714,7 @@ MonoBehaviour:
   money: 0
   score: 0
   moneyText: {fileID: 1669067044}
+  audioSourceMoney: {fileID: 0}
 --- !u!4 &2049016849
 Transform:
   m_ObjectHideFlags: 0

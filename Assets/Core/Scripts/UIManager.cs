@@ -69,7 +69,7 @@ public class UIManager : MonoBehaviour
         if (gameOverScreen != null)
         {
             gameOverScreen.SetActive(true);
-            string textScoreString = $"You have walked over {moneyManager.score} blocks.";
+            string textScoreString = $"You have walked over {moneyManager.score} blocks.\nAdding ${moneyManager.score} to your piggy bank.";
             textScoreSentence.text = textScoreString;
         }
     }
