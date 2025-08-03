@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
     private Vector2Int lastMouseGridPosition;
     private Mouse mouse;
     private float fallTimer;
-    private int currentBlockHeight;
     private float blockSpeed;
     private GameObject currentPreviewBlock;
 
@@ -89,13 +88,12 @@ public class PlayerController : MonoBehaviour
         InitializeQueue();
 
         // Initialize last mouse grid position
-        lastMouseGridPosition = new Vector2Int(5, currentBlockHeight);
+        lastMouseGridPosition = new Vector2Int(5, initialBlocHeight);
 
         // Initialize previous mouse grid position cache
         previousMouseGridPos = lastMouseGridPosition;
 
         // Initialize block falling system
-        currentBlockHeight = initialBlocHeight;
         fallTimer = 0f;
         blockSpeed = blockFallSpeed;
 
@@ -113,7 +111,7 @@ public class PlayerController : MonoBehaviour
         // Invalidate player pivot cache at start of frame (player might have moved)
         playerPivotCacheValid = false;
 
-        // Update block falling first to ensure currentBlockHeight is current
+        // Update block falling
         UpdateBlockFalling();
         // Update mouse position to ensure lastMouseGridPosition uses current height
         HandleMouseInput();
@@ -167,30 +165,28 @@ public class PlayerController : MonoBehaviour
         }
         // Convert world position to grid position using LevelGridManager's WorldToGrid function
         Vector2Int mouseGridPos = levelGridManager.WorldToGrid(mouseWorldPos);
+        // We only use the x coordinate of the mouse grid position
+        mouseGridPos = new Vector2Int(mouseGridPos.x, lastMouseGridPosition.y);
 
         // Apply collision constraints based on shared collision state
         if (isBlockedRight && mouseGridPos.x > lastMouseGridPosition.x)
         {
             // If there's a block on the right, prevent moving past it
-            mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
+            mouseGridPos = new Vector2Int(lastMouseGridPosition.x, lastMouseGridPosition.y);
         }
 
         if (isBlockedLeft && mouseGridPos.x < lastMouseGridPosition.x)
         {
             // If there's a block on the left, prevent moving past it
-            mouseGridPos = new Vector2Int(lastMouseGridPosition.x, mouseGridPos.y);
+            mouseGridPos = new Vector2Int(lastMouseGridPosition.x, lastMouseGridPosition.y);
         }
 
 
         Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
-        mouseGridPos = new Vector2Int(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight);
+        mouseGridPos = new Vector2Int(mouseGridPos.x, lastMouseGridPosition.y);
         if (mouseGridPos.x < 0)
         {
-            mouseGridPos = new Vector2Int(0, mouseGridPos.y);
-        }
-        if (mouseGridPos.y < 0)
-        {
-            mouseGridPos = new Vector2Int(mouseGridPos.x, 0);
+            mouseGridPos = new Vector2Int(0, lastMouseGridPosition.y);
         }
 
         // Only update preview if the grid position has changed (optimization)
@@ -247,7 +243,7 @@ public class PlayerController : MonoBehaviour
         if (levelGridManager.player != null)
         {
             Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
-            Vector2Int expectedPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
+            Vector2Int expectedPosition = new Vector2Int(lastMouseGridPosition.x, lastMouseGridPosition.y);
 
             // If position is out of sync with current height, update it
             if (lastMouseGridPosition.y != expectedPosition.y)
@@ -379,8 +375,7 @@ public class PlayerController : MonoBehaviour
         // Check if block should snap to ground
         if ((y <= 0) || (y - 1 >= 0 && y - 1 < LevelGrid.gridHeight && levelGridManager.IsCellSolid(x, y - 1)))
         {
-            Vector2Int snapGridPos = new Vector2Int(x, y);
-            SnapBlock(snapGridPos);
+            SnapBlock(lastMouseGridPosition);
             return true;
         }
         else
@@ -416,7 +411,7 @@ public class PlayerController : MonoBehaviour
         // Calculate new height based on fall speed
         if (fallTimer >= blockSpeed)
         {
-            currentBlockHeight = currentBlockHeight - 1;
+            lastMouseGridPosition.y = lastMouseGridPosition.y - 1;
             fallTimer = 0f;
 
             // Immediately update position when height changes to prevent desync
@@ -472,7 +467,11 @@ public class PlayerController : MonoBehaviour
         if (levelGridManager != null && levelGridManager.player != null)
         {
             Vector2Int PlayerPivotGridPos = GetPlayerPivotGridPos();
-            lastMouseGridPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + currentBlockHeight);
+            if (lastMouseGridPosition.y > PlayerPivotGridPos.y + initialBlocHeight)
+            {
+                lastMouseGridPosition = new Vector2Int(lastMouseGridPosition.x, PlayerPivotGridPos.y + initialBlocHeight);
+            }
+            lastMouseGridPosition = new Vector2Int(lastMouseGridPosition.x, lastMouseGridPosition.y);
         }
     }
 
@@ -484,14 +483,14 @@ public class PlayerController : MonoBehaviour
         if (currentBlock != null && currentBlock.blockPrefab != null)
         {
             // Use SetBlock to place the entire block pattern on the grid
-            levelGridManager.SetBlock(mouseGridPos.x, PlayerPivotGridPos.y + currentBlockHeight, currentBlock.blockPrefab, currentBlock);
+            levelGridManager.SetBlock(mouseGridPos.x, mouseGridPos.y, currentBlock.blockPrefab, currentBlock);
         }
         else
         {
             Debug.LogWarning("Cannot snap block: currentBlock or its prefab is null!");
             return;
         }
-        currentBlockHeight = initialBlocHeight;
+        lastMouseGridPosition.y = PlayerPivotGridPos.y + initialBlocHeight;
         fallTimer = 0f;
 
         // Update position to match new height
