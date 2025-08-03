@@ -24,7 +24,7 @@ public class PlayerJump : MonoBehaviour
     private Vector2Int lastPlayerGridPosition;
     private System.DateTime isInvincible = System.DateTime.MinValue;
 
-    public AudioSource audioSourceInvincible;
+    public AudioSource audioSourceMoney;
 
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
@@ -98,6 +98,7 @@ public class PlayerJump : MonoBehaviour
                 // Stop player movement
                 Script_Move_World.isPlayerDead = true;
                 isDead = true;
+                audioSourceMoney.Play();
                 return;
             }
 
@@ -120,7 +121,6 @@ public class PlayerJump : MonoBehaviour
                 {
                     // We are walking in a invincible pad for 1 second
                     isInvincible = System.DateTime.Now.AddSeconds(1);
-                    //audioSourceInvincible.Play();
                 }
             }
 

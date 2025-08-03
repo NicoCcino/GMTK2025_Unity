@@ -9,8 +9,6 @@ public class MoneyManager : MonoBehaviour
     public int score = 0; // Player's score, can be used for other purposes
     public TextMeshProUGUI moneyText; // Reference to a UI Text component to display the money
 
-    public AudioSource audioSourceMoney;
-
     void DisplayMoney()
     {
         // This method would typically update a UI element to show the current amount of money
@@ -25,12 +23,7 @@ public class MoneyManager : MonoBehaviour
         money += amount;
         score += amount; // Le score s'incrémente en même temps que l'argent (mais lui ne diminue jamais)
                          //Debug.Log("Money added: " + amount + ". Total Money: " + money);
-        if (amount > 0)
-        {
-            audioSourceMoney.Play(); // Play sound when money is added
-        }
         
-
         DisplayMoney();
     }
 
@@ -52,7 +45,7 @@ public class MoneyManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        audioSourceMoney.Stop();
+        
     }
 
     // Update is called once per frame
