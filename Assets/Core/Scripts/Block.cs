@@ -105,10 +105,4 @@ public class Block
             }
         }
     }
-
-    // Méthode virtuelle que les classes filles peuvent override
-    public virtual void Trigger(Vector2Int position, GameObject player)
-    {
-        Debug.Log($"Block {blockName} triggered at {position}");
-    }
 }

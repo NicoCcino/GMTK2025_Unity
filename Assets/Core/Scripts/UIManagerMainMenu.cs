@@ -12,7 +12,9 @@ public class UIManagerMainMenu : MonoBehaviour
     public TextMeshProUGUI metaMoneyText;
     public TextMeshProUGUI jumpPadPriceText;
     public Button jumpPadBuyButton;     // Le bouton d'achat dans l'UI
+    public Button invinciblePadBuyButton;     // Le bouton d'achat dans l'UI
     public TextMeshProUGUI jumpPadBuyButtonText;   // Le texte affiché sur le bouton
+    public TextMeshProUGUI invinciblePadBuyButtonText;   // Le texte affiché sur le bouton
 
 
 

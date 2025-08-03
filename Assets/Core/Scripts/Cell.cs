@@ -5,6 +5,7 @@ public enum BlockType
     NoBlock,
     Standard,
     JumpPad,
+    InvinciblePad
     // Add more block types as needed
 }
 

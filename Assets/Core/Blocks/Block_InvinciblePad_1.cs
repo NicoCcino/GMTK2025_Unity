@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class Block_JumpPad_1 : Block
+public class Block_InvinciblePad_1 : Block
 {
-    public Block_JumpPad_1() : base("JumpPad", "Prefab_JumpPad_1", "Sprite_JumpPad_1")
+    public Block_InvinciblePad_1() : base("InvinciblePad", "Prefab_InvinciblePad_1", "Sprite_InvinciblePad_1")
     {
         // Pattern (3x3 matrix - visual representation):
         // [0,2] [1,2] [2,2]     O O O
@@ -12,9 +12,9 @@ public class Block_JumpPad_1 : Block
         if (blockMatrix != null)
         {
             blockMatrix[1, 1].isSolid = false;  // Center bottom cell is solid
-            blockMatrix[1, 1].blockType = BlockType.JumpPad;
+            blockMatrix[1, 1].blockType = BlockType.InvinciblePad;
         }
 
-        unlockPrice = 10;
+        unlockPrice = 20;
     }
 }

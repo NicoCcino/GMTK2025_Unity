@@ -16,6 +16,7 @@ public class ProgressionManager : MonoBehaviour
     public UIManagerMainMenu uiManagerMainMenu;
 
     public bool hasBoughtJumpPad = false;
+    public bool hasBoughtInvinciblePad = false;
 
     private void Awake()
     {
@@ -54,6 +55,7 @@ public class ProgressionManager : MonoBehaviour
         allBlocks = new List<Block>
         {
             new Block_JumpPad_1(),
+            new Block_InvinciblePad_1(),
             new Block_T_5(),
             new Block_Simple_1()
         };
@@ -112,7 +114,17 @@ public class ProgressionManager : MonoBehaviour
             hasBoughtJumpPad = true; 
             Debug.Log("Keeping in memory: player has bought jumpPad");
         }
+    }
 
+    public void BuyInvinciblePad()
+    {
+        Debug.Log("BuyInvinciblePad function started");
+        Block blockToBuy = new Block_InvinciblePad_1();
+        if (BuyBlock(blockToBuy) == true)
+        {
+            hasBoughtInvinciblePad = true;
+            Debug.Log("Keeping in memory: player has bought invinciblePad");
+        }
     }
 
     public void UnlockLevel(int level)

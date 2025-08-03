@@ -22,6 +22,7 @@ public class PlayerJump : MonoBehaviour
     private float lastHeightOffset = 0;
     private bool isDead = false;
     private Vector2Int lastPlayerGridPosition;
+    private System.DateTime isInvincible = System.DateTime.MinValue;
 
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
@@ -89,7 +90,7 @@ public class PlayerJump : MonoBehaviour
             }
 
             // Check death
-            if (levelGridManager.IsCellSolid(playerGridPosition.x, playerGridPosition.y+1))
+            if (levelGridManager.IsCellSolid(playerGridPosition.x, playerGridPosition.y+1) && System.DateTime.Now > isInvincible)
             {
                 Debug.Log("Player is dead");
                 // Stop player movement
@@ -112,6 +113,11 @@ public class PlayerJump : MonoBehaviour
                     jumpHeight = 5*jumpHeight;
                     StartJump();
                     jumpHeight = backJumpHeight;
+                }
+                if (blockType == BlockType.InvinciblePad)
+                {
+                    // We are walking in a invincible pad for 1 second
+                    isInvincible = System.DateTime.Now.AddSeconds(1);
                 }
             }
 

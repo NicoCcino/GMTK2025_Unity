@@ -27,9 +27,4 @@ public class Block_T_5 : Block
             blockMatrix[1, 0].blockType = BlockType.Standard;
         }
     }
-
-    public override void Trigger(Vector2Int position, GameObject player)
-    {
-
-    }
 }

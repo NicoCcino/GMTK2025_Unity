@@ -39,11 +39,4 @@ public class Block_Template : Block
             // blockMatrix[1, 2].isSolid = true;  // Top
         }
     }
-
-    public override void Trigger(Vector2Int position, GameObject player)
-    {
-        base.Trigger(position, player);
-        Debug.Log("Template block triggered!");
-        // Add your custom block behavior here
-    }
 }

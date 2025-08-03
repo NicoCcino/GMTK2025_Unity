@@ -6,7 +6,7 @@ public class ShopButtonController : MonoBehaviour
     public ProgressionManager progressionManager;
     public UIManagerMainMenu uIManager;
 
-
+// ************** JumpPad **************
     public void ButtonBuyJumpPad()
     {
 
@@ -22,18 +22,46 @@ public class ShopButtonController : MonoBehaviour
     }
 
     public void UpdateJumpPadBuyButton()
-{
-    if (progressionManager.hasBoughtJumpPad)
     {
-        uIManager.jumpPadBuyButton.interactable = false;
-        uIManager.jumpPadBuyButtonText.text = "Bought";
+        if (progressionManager.hasBoughtJumpPad)
+        {
+            uIManager.jumpPadBuyButton.interactable = false;
+            uIManager.jumpPadBuyButtonText.text = "Bought";
+        }
+        else
+        {
+            uIManager.jumpPadBuyButton.interactable = true;
+            uIManager.jumpPadBuyButtonText.text = "Buy";
+        }
     }
-    else
+
+// ************** InvinciblePad **************
+    public void ButtonBuyInvinciblePad()
     {
-        uIManager.jumpPadBuyButton.interactable = true;
-        uIManager.jumpPadBuyButtonText.text = "Buy";
+        if (progressionManager != null)
+        {
+            progressionManager.BuyInvinciblePad();
+            UpdateInvinciblePadBuyButton();
+        }
+        else
+        {
+            Debug.LogWarning("ProgressionManager not found in current scene!");
+        }
     }
-}
+
+    public void UpdateInvinciblePadBuyButton()
+    {
+        if (progressionManager.hasBoughtInvinciblePad)
+        {
+            uIManager.invinciblePadBuyButton.interactable = false;
+            uIManager.invinciblePadBuyButtonText.text = "Bought";
+        }
+        else
+        {
+            uIManager.invinciblePadBuyButton.interactable = true;
+            uIManager.invinciblePadBuyButtonText.text = "Buy";
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

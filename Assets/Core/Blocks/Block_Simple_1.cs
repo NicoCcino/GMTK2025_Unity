@@ -15,10 +15,4 @@ public class Block_Simple_1 : Block
             blockMatrix[1, 1].blockType = BlockType.Standard;
         }
     }
-
-    public override void Trigger(Vector2Int position, GameObject player)
-    {
-        base.Trigger(position, player);
-        Debug.Log("Simple block triggered - nothing special happens!");
-    }
 }
