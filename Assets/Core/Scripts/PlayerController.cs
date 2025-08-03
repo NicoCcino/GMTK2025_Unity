@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
 
     public AudioSource audioSourceRotate;
 
+    public static bool isPlayerDead = false;
+
     private Camera mainCamera;
     private Vector2Int lastMouseGridPosition;
     private Mouse mouse;
@@ -104,12 +106,17 @@ public class PlayerController : MonoBehaviour
 
         // Record start time for initialization delay
         startTime = Time.time;
+        isPlayerDead = false;
 
 
     }
 
     void Update()
     {
+        if (isPlayerDead)
+        {
+            return;
+        }
         // Invalidate player pivot cache at start of frame (player might have moved)
         playerPivotCacheValid = false;
 

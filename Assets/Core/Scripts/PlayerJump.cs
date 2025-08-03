@@ -97,6 +97,7 @@ public class PlayerJump : MonoBehaviour
                 Debug.Log("Player is dead");
                 // Stop player movement
                 Script_Move_World.isPlayerDead = true;
+                PlayerController.isPlayerDead = true;
                 isDead = true;
                 audioSourceMoney.Play();
                 return;
