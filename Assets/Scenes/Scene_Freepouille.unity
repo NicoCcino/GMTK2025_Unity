@@ -183,7 +183,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 389547d708deb0c408c7bf3649794c83, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.7
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -280,7 +280,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 251e3ec62584ea84bb38a1108c88bf00, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.6
+  m_Volume: 0.4
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -3632,6 +3632,7 @@ MonoBehaviour:
   uiManagerMainMenu: {fileID: 0}
   hasBoughtJumpPad: 0
   hasBoughtInvinciblePad: 0
+  highScore: 0
   allBlocks: []
   availableBlocks: []
 --- !u!4 &1755047095
