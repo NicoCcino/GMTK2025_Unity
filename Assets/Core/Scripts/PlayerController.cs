@@ -20,6 +20,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Speed at which the block falls when clicking in cells per second")]
     public float blockClickFallSpeed = 0.01f;
 
+    public AudioSource audioSourceRotate;
+
     private Camera mainCamera;
     private Vector2Int lastMouseGridPosition;
     private Mouse mouse;
@@ -458,6 +460,7 @@ public class PlayerController : MonoBehaviour
             }
 
             Debug.Log($"Block {currentBlock.blockName} rotated 90° counterclockwise - Current rotation: {currentBlock.rotation}°");
+            audioSourceRotate.Play();
         }
     }
 
