@@ -313,7 +313,7 @@ public class PlayerController : MonoBehaviour
         
 
         
-        if (LevelGrid.grid[xChecked, y] != null)
+        if (levelGridManager.IsCellSolid(xChecked, y))
         {
             return true; // There's a block on the right
         }
@@ -348,7 +348,7 @@ public class PlayerController : MonoBehaviour
         
 
         
-        if (LevelGrid.grid[xChecked, y] != null)
+        if (levelGridManager.IsCellSolid(xChecked, y))
         {
             return true; // There's a block on the left
         }
@@ -365,8 +365,7 @@ public class PlayerController : MonoBehaviour
         if (x >= LevelGrid.gridWidth) x = 0;
 
         // Check if block should snap to ground
-        if ((y <= 0) ||
-        (y - 1 >= 0 && y - 1 < LevelGrid.gridHeight && LevelGrid.InBounds(x, y - 1) && LevelGrid.grid[x, y - 1] != null))
+        if ((y <= 0) || (y - 1 >= 0 && y - 1 < LevelGrid.gridHeight && levelGridManager.IsCellSolid(x, y - 1)))
         {
             Vector2Int snapGridPos = new Vector2Int(x, y);
             SnapBlock(snapGridPos);
