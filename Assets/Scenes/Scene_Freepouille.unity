@@ -465,8 +465,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -695,10 +695,10 @@ RectTransform:
   - {fileID: 386206842}
   m_Father: {fileID: 1619843404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -500, y: -100}
-  m_SizeDelta: {x: 800, y: 100}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -100}
+  m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &348129035
 MonoBehaviour:
@@ -1163,6 +1163,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1477273768612482027, guid: fca58bf476293ce48883995d162319d0, type: 3}
+      propertyPath: playerRunSpeed
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1711033907551617605, guid: fca58bf476293ce48883995d162319d0, type: 3}
       propertyPath: levelGridManager
       value: 
@@ -1330,14 +1334,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawBlockHeightOffset: 0.5
-  floorPrefab: {fileID: 0}
-  floorWidth: 50
+  simpleBlockPrefab: {fileID: 6472476151444608372, guid: b69a18c7d91265b41accb528c789babe, type: 3}
   player: {fileID: 2021525336}
   playerGridPosition: {x: 0, y: 0}
   gizmoColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   cellSize: 1
   gridOrigin: {fileID: 1741758150}
   gridOriginBackup: {x: 0, y: 0, z: 0}
+  floorPrefab: {fileID: 0}
+  floorWidth: 50
   minDistanceToTeleportChunk: 75
 --- !u!4 &718335859
 Transform:
@@ -1640,7 +1645,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &958669818
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2006,6 +2011,32 @@ MonoBehaviour:
   blockFallSpeed: 1
   blockClickFallSpeed: 0.01
   progressionManager: {fileID: 1755047094}
+  currentBlock:
+    blockName: 
+    gameObject: {fileID: 0}
+    gridPosition: {x: 0, y: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
+    rotation: 0
+    unlockPrice: 0
+  blockQueue:
+  - blockName: 
+    gameObject: {fileID: 0}
+    gridPosition: {x: 0, y: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
+    rotation: 0
+    unlockPrice: 0
+  - blockName: 
+    gameObject: {fileID: 0}
+    gridPosition: {x: 0, y: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
+    rotation: 0
+    unlockPrice: 0
+  - blockName: 
+    gameObject: {fileID: 0}
+    gridPosition: {x: 0, y: 0}
+    color: {r: 0, g: 0, b: 0, a: 0}
+    rotation: 0
+    unlockPrice: 0
   uiManager: {fileID: 1619843405}
 --- !u!4 &1056008645
 Transform:
@@ -3179,6 +3210,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   metaMoney: 0
   unlockedLevels: 
+  uiManagerMainMenu: {fileID: 0}
+  hasBoughtJumpPad: 0
+  allBlocks: []
+  availableBlocks: []
 --- !u!4 &1755047095
 Transform:
   m_ObjectHideFlags: 0
@@ -3315,6 +3350,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Block_Simple_1x1
       objectReference: {fileID: 0}
+    - target: {fileID: 6614318499680009648, guid: efb98e375f765014ea6ed43741860bde, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3337,7 +3376,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1864558483
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3603,6 +3642,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Block_T_5
       objectReference: {fileID: 0}
+    - target: {fileID: 288894404862098388, guid: d42a5a8bee1e3c748888473f69767d31, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7530837754188928172, guid: d42a5a8bee1e3c748888473f69767d31, type: 3}
       propertyPath: m_LocalPosition.x
       value: 15
@@ -3699,6 +3742,10 @@ PrefabInstance:
     - target: {fileID: 6472476151444608372, guid: b69a18c7d91265b41accb528c789babe, type: 3}
       propertyPath: m_Name
       value: Prefab_Block_Simple_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6472476151444608372, guid: b69a18c7d91265b41accb528c789babe, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3853,6 +3900,10 @@ PrefabInstance:
     - target: {fileID: 3830989669865293777, guid: 0639dae14610dff449428ebb62558b70, type: 3}
       propertyPath: m_Name
       value: bevel-hq-brick-2x6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3830989669865293777, guid: 0639dae14610dff449428ebb62558b70, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4495076634947444075, guid: 0639dae14610dff449428ebb62558b70, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4094,6 +4145,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bevel-hq-brick-2x4
       objectReference: {fileID: 0}
+    - target: {fileID: 7892753296995450659, guid: 95001aadb71e7c64bbebb373905d98bf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4150,6 +4205,10 @@ PrefabInstance:
     - target: {fileID: 9154117345118230043, guid: e116fd54da5c71446be3b889026c3b0b, type: 3}
       propertyPath: m_Name
       value: Prefab_Block_JumpPad_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154117345118230043, guid: e116fd54da5c71446be3b889026c3b0b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

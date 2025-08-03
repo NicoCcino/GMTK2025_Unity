@@ -8,9 +8,7 @@ public class LevelGridManager : MonoBehaviour
     [Header("Blocks Settings")]
 
     public float drawBlockHeightOffset = 0.5f;
-
-    public GameObject floorPrefab;
-    public float floorWidth = 50f;
+    public GameObject simpleBlockPrefab;
 
     // Player reference and grid position
     [Header("Player Settings")]
@@ -33,6 +31,8 @@ public class LevelGridManager : MonoBehaviour
     [Header("Infinite Ground Settings")]
     [Tooltip("Reference to the player GameObject")]
 
+    public GameObject floorPrefab;
+    public float floorWidth = 50f;
     public float minDistanceToTeleportChunk = 50f;
 
 
