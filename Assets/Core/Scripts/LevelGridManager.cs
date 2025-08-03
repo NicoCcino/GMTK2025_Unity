@@ -9,6 +9,11 @@ public class LevelGridManager : MonoBehaviour
 
     public float drawBlockHeightOffset = 0.5f;
     public GameObject simpleBlockPrefab;
+    
+    [Header("Block Type Prefabs")]
+    public GameObject standardBlockPrefab;
+    public GameObject jumpPadBlockPrefab;
+    public GameObject invinciblePadBlockPrefab;
 
     // Player reference and grid position
     [Header("Player Settings")]
@@ -36,23 +41,114 @@ public class LevelGridManager : MonoBehaviour
     public float minDistanceToTeleportChunk = 50f;
 
 
-    public GameObject DrawBlock(int x, int y, GameObject blockPrefab, int blockRotation = 0)
+    public GameObject DrawBlock(int x, int y, Block block)
     {
-        // Placement du bloc en 3D dans le monde
-        Vector3 worldPos = GridToWorld(x, y);
-        worldPos += new Vector3(0.5f, drawBlockHeightOffset,0f); // Offset
+        // Create parent GameObject and set its position
+        GameObject newBlockGO = new GameObject($"Block_{block.blockName}");
+        Vector3 parentWorldPos = GridToWorld(x, y);
+        newBlockGO.transform.position = parentWorldPos;
+        Debug.Log($"Created parent block '{newBlockGO.name}' at position {parentWorldPos} for grid ({x}, {y})");
 
+        int gridWidth = LevelGrid.grid.GetLength(0);
+        //Debug.Log("gridWidth: " + gridWidth);
+        int gridHeight = LevelGrid.grid.GetLength(1);
+        for (int i = 0; i < 3; i++) // Pour chaque cellule de la matrice du bloc
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                int worldGridPosX = x + i - 1;
+                int worldGridPosY = y + j -1;
+                Debug.Log($"Trying to set cell at ({i}, {j}) in matrix of {block.blockName} at position ({worldGridPosX}, {worldGridPosY})");
 
-        // Applique une rotation selon Z (Unity fonctionne avec Z vers l'écran en 2D vue de dessus)
-        Quaternion rotation = Quaternion.Euler(0f, 0f, -blockRotation);
+                // Vérifie si les coordonnées sont dans les limites de la grille
+                if (worldGridPosX >= 0 && worldGridPosX < gridWidth &&
+                    worldGridPosY >= 0 && worldGridPosY < gridHeight)
+                {
+                    Vector3 cellWorldPos = GridToWorld(worldGridPosX, worldGridPosY);
+                    cellWorldPos += new Vector3(0.5f, drawBlockHeightOffset, 0f); // Offset
+                    Cell cell = block.blockMatrix[i, j];
+                    
+                    // Skip if cell is null
+                    if (cell == null)
+                    {
+                        Debug.Log($"Skipping null cell at matrix position ({i}, {j})");
+                        continue;
+                    }
+                    
+                    // Debug cell properties
+                    Debug.Log($"Cell ({i}, {j}): isSolid={cell.isSolid}, blockType={cell.blockType}");
+                    
+                    GameObject childBlockGO = null;
+                    
+                    // For each cell, we create a GameObject at the cell position depending on the type of block
+                    // None block don't create a GameObject
+                    // Standard block is a Prefab_Block_Simple_1
+                    // JumpPad block is a Prefab_JumpPad_1
+                    // InvinciblePad block is a Prefab_InvinciblePad_1
+                    // Each of those block are child of the GameObject newBlockGO
+                    switch (cell.blockType)
+                    {
+                        case BlockType.NoBlock:
+                            // None block: don't create a GameObject
+                            Debug.Log($"Cell ({i}, {j}) is NoBlock, skipping");
+                            continue;
+                            
+                        case BlockType.Standard:
+                            // Standard block: use standardBlockPrefab
+                            Debug.Log($"Cell ({i}, {j}) is Standard block, standardBlockPrefab null? {standardBlockPrefab == null}");
+                            if (standardBlockPrefab != null)
+                                childBlockGO = Instantiate(standardBlockPrefab, cellWorldPos, Quaternion.identity);
+                            else
+                                Debug.LogError("standardBlockPrefab is NULL! Assign it in the Inspector.");
+                            break;
+                            
+                        case BlockType.JumpPad:
+                            // JumpPad block: use jumpPadBlockPrefab
+                            Debug.Log($"Cell ({i}, {j}) is JumpPad block, jumpPadBlockPrefab null? {jumpPadBlockPrefab == null}");
+                            if (jumpPadBlockPrefab != null)
+                                childBlockGO = Instantiate(jumpPadBlockPrefab, cellWorldPos, Quaternion.identity);
+                            else
+                                Debug.LogError("jumpPadBlockPrefab is NULL! Assign it in the Inspector.");
+                            break;
+                            
+                        case BlockType.InvinciblePad:
+                            // InvinciblePad block: use invinciblePadBlockPrefab
+                            Debug.Log($"Cell ({i}, {j}) is InvinciblePad block, invinciblePadBlockPrefab null? {invinciblePadBlockPrefab == null}");
+                            if (invinciblePadBlockPrefab != null)
+                                childBlockGO = Instantiate(invinciblePadBlockPrefab, cellWorldPos, Quaternion.identity);
+                            else
+                                Debug.LogError("invinciblePadBlockPrefab is NULL! Assign it in the Inspector.");
+                            break;
+                            
+                        default:
+                            Debug.LogWarning($"Unknown block type: {cell.blockType} at cell ({i}, {j})");
+                            break;
+                    }
+                    
+                    // Set the created GameObject as child of the parent block
+                    if (childBlockGO != null)
+                    {
+                        childBlockGO.transform.SetParent(newBlockGO.transform, true); // Keep world position
+                        Debug.Log($"Created {cell.blockType} block at world pos {cellWorldPos} (grid: {worldGridPosX}, {worldGridPosY})");
+                    }
+                }
+            }
+        }
 
-        // Place le bloc
-        GameObject newBlockGO = Instantiate(blockPrefab, worldPos, rotation, this.transform);
+        // Check if any children were created
+        if (newBlockGO.transform.childCount == 0)
+        {
+            Debug.LogWarning($"No child blocks were created for {block.blockName}! Check block matrix and blockType assignments.");
+        }
+        else
+        {
+            Debug.Log($"Successfully created {newBlockGO.transform.childCount} child blocks for {block.blockName}");
+        }
 
         // Gestion du parentage du bloc au sol
         foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
         {
-            if (worldPos.x >= floor.transform.position.x && worldPos.x < floor.transform.position.x + floorWidth)
+            if (parentWorldPos.x >= floor.transform.position.x && parentWorldPos.x < floor.transform.position.x + floorWidth)
             { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
                 newBlockGO.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
                 break;
@@ -60,28 +156,6 @@ public class LevelGridManager : MonoBehaviour
         }
 
         return newBlockGO; // Donne l'instance du bloc 3D crée en sortie
-    }
-
-    public void MoveDrawBlock(int currentPosX, int currentPosY, int newPosX, int newPosY)
-    {
-        //Récupère le bloc à déplacer
-        GameObject blockPrefab = LevelGrid.grid[currentPosX, currentPosY].blockGO;
-        // Déplace le bloc sur sa nouvelle position
-        blockPrefab.transform.position = GridToWorld(newPosX, newPosY) + new Vector3(cellSize, cellSize + drawBlockHeightOffset, 0) * 0.5f; // Center the block in the cell
-
-
-        // Revérifie le parentage si on a déplacé le bloc sur le côté
-        if (newPosX != currentPosX)
-        {
-            foreach (GameObject floor in GameObject.FindGameObjectsWithTag("Floor"))
-            {
-                if (blockPrefab.transform.position.x >= floor.transform.position.x && blockPrefab.transform.position.x < floor.transform.position.x + floorWidth)
-                { // Si le bloc est sur une position World X entre la position World X de début du floor et celle de fin
-                    blockPrefab.transform.SetParent(floor.transform); // On attache le bloc au sol qui est en dessous - il se déplacera ainsi avec le sol
-                    break;
-                }
-            }
-        }
     }
 
     public void SetBlock(int x, int y, GameObject blockPrefab, Block block)
@@ -92,7 +166,7 @@ public class LevelGridManager : MonoBehaviour
         //Debug.Log("gridHeight: " + gridHeight);
 
         // Create an actual instance of the block at this position
-        GameObject blockInstance = DrawBlock(x, y, block.blockPrefab, block.rotation);
+        GameObject blockInstance = DrawBlock(x, y, block);
 
         for (int i = 0; i < 3; i++) // Pour chaque cellule de la matrice du bloc
         {

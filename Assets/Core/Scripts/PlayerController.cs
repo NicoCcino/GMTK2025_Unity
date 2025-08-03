@@ -214,7 +214,7 @@ public class PlayerController : MonoBehaviour
             // Create a new preview block at the new mouse position (visual only, no grid registration)
             if (currentBlock != null && currentBlock.blockPrefab != null)
             {
-                currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlock.blockPrefab, currentBlock.rotation);
+                currentPreviewBlock = levelGridManager.DrawBlock(mouseGridPos.x, mouseGridPos.y, currentBlock);
             }
             else if (currentBlock != null)
             {
@@ -458,7 +458,7 @@ public class PlayerController : MonoBehaviour
             // Create new preview with rotated block
             if (currentBlock.blockPrefab != null)
             {
-                currentPreviewBlock = levelGridManager.DrawBlock(lastMouseGridPosition.x, lastMouseGridPosition.y, currentBlock.blockPrefab, currentBlock.rotation);
+                currentPreviewBlock = levelGridManager.DrawBlock(lastMouseGridPosition.x, lastMouseGridPosition.y, currentBlock);
             }
 
             Debug.Log($"Block {currentBlock.blockName} rotated 90° counterclockwise - Current rotation: {currentBlock.rotation}°");
@@ -687,6 +687,14 @@ public class PlayerController : MonoBehaviour
          else if (template is Block_InvinciblePad_1)
         {
             copy = new Block_InvinciblePad_1();
+        }
+        else if (template is Block_L_4)
+        {
+            copy = new Block_L_4();
+        }
+        else if (template is Block_S_4)
+        {
+            copy = new Block_S_4();
         }
         else
         {

@@ -38,10 +38,11 @@ public class GameManager : MonoBehaviour
             uiManager.ShowGameOverScreen();
 
             // Update high score
-            if (progressionManager.highScore < moneyManager.money) {
+            if (progressionManager.highScore < moneyManager.money)
+            {
                 progressionManager.highScore = moneyManager.money;
             }
-            
+
             // Update money
             progressionManager.metaMoney += moneyManager.money;
 
@@ -50,4 +51,5 @@ public class GameManager : MonoBehaviour
             audioSourceSing.Stop();
         }
     }
+    
 }

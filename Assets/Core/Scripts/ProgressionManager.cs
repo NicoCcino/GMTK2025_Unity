@@ -59,7 +59,9 @@ public class ProgressionManager : MonoBehaviour
             new Block_JumpPad_1(),
             new Block_InvinciblePad_1(),
             new Block_T_5(),
-            new Block_Simple_1()
+            new Block_Simple_1(),
+            new Block_L_4(),
+            new Block_S_4()
         };
 
         Debug.Log($"Initialized {allBlocks.Count} blocks");
@@ -75,7 +77,9 @@ public class ProgressionManager : MonoBehaviour
         {
             // new Block_JumpPad_1(),
             new Block_T_5(),
-            new Block_Simple_1()
+            new Block_Simple_1(),
+            new Block_L_4(),
+            new Block_S_4()
         };
 
         Debug.Log($"Initialized {availableBlocks.Count} blocks");
