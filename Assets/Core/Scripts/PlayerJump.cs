@@ -25,6 +25,7 @@ public class PlayerJump : MonoBehaviour
     private System.DateTime isInvincible = System.DateTime.MinValue;
 
     public AudioSource audioSourceMoney;
+    public AudioSource audioSourceInvincible;
 
     [Header("Grid Settings")]
     [Tooltip("Reference to the LevelGridManager")]
@@ -122,14 +123,14 @@ public class PlayerJump : MonoBehaviour
                 {
                     // We are walking in a invincible pad for 1 second
                     isInvincible = System.DateTime.Now.AddSeconds(1);
-                    // TODO : Trigger Invincibility sound effect
+                    audioSourceInvincible.Play();
                 }
             }
 
 
-            if (isInvincible != System.DateTime.MinValue) && (System.DateTime.Now > isInvincible)
+            if ((isInvincible != System.DateTime.MinValue) && (System.DateTime.Now > isInvincible))
             {
-                // TODO : UnTrigger Invincibility sound effect
+                audioSourceInvincible.Stop();
                 isInvincible = System.DateTime.MinValue;
             }
 
